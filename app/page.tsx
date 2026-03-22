@@ -17,8 +17,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center">
       <h1 className="text-4xl mb-6">Enter Username</h1>
-      <form action="/search" className="flex space-x-2">
-        <input
+      <input
           name="name"
           placeholder="friendly_user123"
           value={username}
@@ -31,7 +30,6 @@ export default function Page() {
         >
           Submit
         </button>
-      </form>
     </div>
   )
 }
