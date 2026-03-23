@@ -1,8 +1,8 @@
-"use client" // for now
-import {Lobby} from "./types";
+"use client";
+import {BrowserRow} from "./types";
 
 interface GridProps {
-    items: Lobby[];
+    items: BrowserRow[];
 }
 export default function Grid({items}: GridProps) {
     return (
@@ -12,16 +12,15 @@ export default function Grid({items}: GridProps) {
                     <p className="flex-grow font-semibold truncate text-center">
                         {item.name}
                     </p>
+                    <p>{item.type}</p>
+                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                    <p>{item.size}/30</p>
+                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
                     <button
                         onClick={() => alert(`Joining ${item.name}'s Game...`)}
                         className="bg-blue-400 rounded text-lg px-4 font-semibold">
                         Join
                     </button>
-                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                    <p>{item.type}</p>
-                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                    <p>{item.size}/30</p>
-                    
                 </div>
             ))}
         </div>
