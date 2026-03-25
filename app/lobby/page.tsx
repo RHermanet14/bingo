@@ -9,6 +9,7 @@ export default function LobbyPage() {
         {id: 1, name:"john"},
         {id: 2, name:"kelly"},
         {id: 3, name: "crazypineapple808974"},
+        {id: 4, name:"meter"}
       ];
     
     return (
@@ -16,11 +17,11 @@ export default function LobbyPage() {
             <h1 className="text-2xl text-center p-1 bg-gray-400">Lobby Code: 123456</h1>
             <div className="bg-gray-200">
                 <div className="p-2 flex gap-4 text-lg">
-                <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
-                <p className="ml-auto">1/30</p>
-                <button className="bg-blue-400">Start Game</button>
+                    <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
+                    <p className="ml-auto">1/30</p>
+                    <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
                 </div>
-                    <div className="min-h-screen flex flex-col items-center justify-center">
+                <div className="min-h-screen flex flex-col items-center justify-center">
                     <Grid items={items}/>
                 </div>
             </div>
