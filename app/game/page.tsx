@@ -1,3 +1,4 @@
+"use client";
 import Board from "./board/Board"
 
 export default function Page() {
