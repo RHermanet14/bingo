@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef, useCallback} from 'react';
 
 const generatedNumbers: number[] = [];
 
@@ -22,21 +22,34 @@ function convertToBingoNumber(num: number): string {
 
 export default function Timer() {
     const [letterNum, setLetterNum] = useState("");
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    function setBingoNumber() {
-        const num: number = getRandomBingoNumber();
+    function stopTimer() {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+        
+    }
+
+    const setBingoNumber = useCallback(() => {
+        let num: number = getRandomBingoNumber();
+        while (generatedNumbers.includes(num) && generatedNumbers.length < 75) {num = getRandomBingoNumber();}
+        if (generatedNumbers.length >= 75)
+            stopTimer();
         generatedNumbers.push(num);
         const str: string = convertToBingoNumber(num);
         setLetterNum(str);
-    }
+    }, []);
 
     useEffect(() => {
-        const interval = setInterval(setBingoNumber, 5000);
+        intervalRef.current = setInterval(setBingoNumber, 5000);
         return () => {
-            clearInterval(interval);
+            if (intervalRef.current)
+                clearInterval(intervalRef.current);
         };
-    }, []);
-    
+    }, [setBingoNumber]);
+
     return (
         <div>
             <h1 className="text-4xl mb-6">{letterNum}</h1>
