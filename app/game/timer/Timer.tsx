@@ -1,9 +1,13 @@
 import {useEffect, useState, useRef, useCallback} from 'react';
 
-const generatedNumbers: number[] = [];
+const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i);
 
 function getRandomBingoNumber(): number {
-    return Math.floor(Math.random() * 75) + 1;
+    if (remainingBingoNumbers.length === 0)
+        return -1;
+    const index: number =  Math.floor(Math.random() * remainingBingoNumbers.length);
+    const removedElement = remainingBingoNumbers.splice(index, 1);
+    return removedElement[0];
 }
 
 function convertToBingoNumber(num: number): string {
@@ -29,17 +33,16 @@ export default function Timer() {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-        
     }
 
     const setBingoNumber = useCallback(() => {
-        let num: number = getRandomBingoNumber();
-        while (generatedNumbers.includes(num) && generatedNumbers.length < 75) {num = getRandomBingoNumber();}
-        if (generatedNumbers.length >= 75)
+        const num: number = getRandomBingoNumber();
+        if (num <= -1) {
             stopTimer();
-        generatedNumbers.push(num);
-        const str: string = convertToBingoNumber(num);
-        setLetterNum(str);
+        } else {
+            const str: string = convertToBingoNumber(num + 1);
+            setLetterNum(str);
+        }
     }, []);
 
     useEffect(() => {
