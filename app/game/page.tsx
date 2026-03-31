@@ -1,6 +1,5 @@
 "use client";
-import Board from "./board/Board"
-import Timer from "./timer/Timer"
+import {Board, Timer} from "./board/Board"
 
 export default function Page() {
   

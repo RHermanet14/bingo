@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-const numArr: number[] = [];
-const winConditions: number[][] = [
+const boardNumbers: number[] = []; // represents user's board
+const winConditions: number[][] = [ // list of win conditions
     [0,1,2,3,4], // rows
     [5,6,7,8,9],
     [10,11,12,13,14],
@@ -16,19 +16,21 @@ const winConditions: number[][] = [
     [0,6,12,18,24], // Diagonals
     [20,16,12,8,4],
 ];
+const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i); // numbers to be called by timer
+const generatedNumbers: number[] = []; // list of numbers already called
 
-function getBingoNumber(letter: number): number {
+function generateBoardNumber(letter: number): number {
     return Math.floor(Math.random() * 15) + (letter * 15) + 1;
 };
 
 function buildBoard(index: number): number {
-        let space: number = getBingoNumber(index%5);
-        while(numArr.includes(space)) {space = getBingoNumber(index%5);}
-        numArr.push(space);
+        let space: number = generateBoardNumber(index%5);
+        while(boardNumbers.includes(space)) {space = generateBoardNumber(index%5);}
+        boardNumbers.push(space);
         return space;
 }
 
-export default function Board() {
+export function Board() {
     const [active, setActive] = useState<boolean[]>(
         () => Array.from({ length: 25 }, () => false)
     );
@@ -79,5 +81,64 @@ export default function Board() {
             <button onClick={callBingo}>Call Bingo</button>
         </div>
         
+    );
+}
+
+function getRandomBingoNumber(): number {
+    if (remainingBingoNumbers.length === 0)
+        return -1;
+    const index: number =  Math.floor(Math.random() * remainingBingoNumbers.length);
+    const removedElement = remainingBingoNumbers.splice(index, 1);
+    return removedElement[0];
+}
+
+function convertToBingoNumber(num: number): string {
+    const numString: string = num.toString();
+    if (num < 16)
+        return "B" + numString; 
+    else if (num < 31)
+        return "I" + numString;
+    else if (num < 46)
+        return "N" + numString;
+    else if (num < 61)
+        return "G" + numString;
+    else
+        return "O" + numString;
+}
+
+export function Timer() {
+    const [letterNum, setLetterNum] = useState("");
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    function stopTimer() {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+    }
+
+    const setBingoNumber = useCallback(() => {
+        const num: number = getRandomBingoNumber() + 1;
+        if (num <= 0) {
+            stopTimer();
+        } else {
+            generatedNumbers.push(num);
+            const str: string = convertToBingoNumber(num);
+            setLetterNum(str);
+        }
+    }, []);
+
+    useEffect(() => {
+        intervalRef.current = setInterval(setBingoNumber, 5000);
+        return () => {
+            if (intervalRef.current)
+                clearInterval(intervalRef.current);
+        };
+    }, [setBingoNumber]);
+
+    return (
+        <div>
+            <h1 className="text-4xl mb-6">{letterNum}</h1>
+        </div>
     );
 }
