@@ -48,7 +48,7 @@ export function Board() {
         let isBingo: boolean = true;
         while (winConditions.at(index) !== undefined) {
             winConditions[index].forEach(space => {
-                if (!active[space]) // just for now, check if space is active
+                if (!active[space] || !generatedNumbers.includes(space)) // just for now, check if space is active
                     isBingo = false;
             });
             if (isBingo) {
@@ -79,8 +79,7 @@ export function Board() {
                 ))}
             </div>
             <button onClick={callBingo}>Call Bingo</button>
-        </div>
-        
+        </div>    
     );
 }
 
