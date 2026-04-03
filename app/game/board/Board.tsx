@@ -19,6 +19,9 @@ const winConditions: number[][] = [ // list of win conditions
 const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i); // numbers to be called by timer
 const generatedNumbers: number[] = []; // list of numbers already called
 
+let isTimerStopped: boolean = false;
+const bingoNumberInterval: number = 3000;
+
 function generateBoardNumber(letter: number): number {
     return Math.floor(Math.random() * 15) + (letter * 15) + 1;
 };
@@ -52,6 +55,7 @@ export function Board() {
                     isBingo = false;
             });
             if (isBingo) {
+                isTimerStopped = true;
                 alert("you win")
                 return true;
             }
@@ -118,7 +122,7 @@ export function Timer() {
 
     const setBingoNumber = useCallback(() => {
         const num: number = getRandomBingoNumber() + 1;
-        if (num <= 0) {
+        if (num <= 0 || isTimerStopped) {
             stopTimer();
         } else {
             generatedNumbers.push(num);
@@ -128,7 +132,7 @@ export function Timer() {
     }, []);
 
     useEffect(() => {
-        intervalRef.current = setInterval(setBingoNumber, 5000);
+        intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
         return () => {
             if (intervalRef.current)
                 clearInterval(intervalRef.current);
