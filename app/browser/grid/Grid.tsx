@@ -1,10 +1,12 @@
 "use client";
+import { useRouter } from "next/navigation";
 import {BrowserRow} from "./types";
 
 interface GridProps {
     items: BrowserRow[];
 }
 export default function Grid({items}: GridProps) {
+    const router = useRouter();
     return (
         <div className="grid grid-cols-1 border-t border-gray-300">
             {items.map((item) => (
@@ -17,7 +19,7 @@ export default function Grid({items}: GridProps) {
                     <p>{item.size}/30</p>
                     <div className="w-px h-6 bg-gray-300 mx-2"></div>
                     <button
-                        onClick={() => alert(`Joining ${item.name}'s Game...`)}
+                        onClick={() => router.push(`/lobby/${item.id}`)}
                         className="bg-blue-400 rounded text-lg px-4 font-semibold">
                         Join
                     </button>
