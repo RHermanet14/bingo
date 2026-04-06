@@ -10,7 +10,7 @@ export default function Page() {
       alert("Invalid username");
       return
     }
-    localStorage.setItem("username", username); // change to middleware
+    document.cookie =`username=${username}; path=/; max-age=86400`; // 1 day
     router.push("/browser");
   };
 

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
 
 const boardNumbers: number[] = []; // represents user's board
 const winConditions: number[][] = [ // list of win conditions
