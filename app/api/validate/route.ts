@@ -8,3 +8,6 @@ export async function POST(req: Request) {
         .single();
     return data?.password === password;
 }
+
+// checks if lobby password = user submitted password
+// use later

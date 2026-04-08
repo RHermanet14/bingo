@@ -4,11 +4,10 @@ import {BrowserRow} from "./grid/types"
 import { useRouter } from "next/navigation";
 import {useEffect, useState} from "react"
 import {supabase} from "@/lib/supabase"
-import { cookies } from "next/headers";
 
 type Room = {
   id: string;
-  name: string;
+  type: string;
   host: string;
 }
 
@@ -17,26 +16,17 @@ export default function BrowserPage() {
 
 //#region new stuff
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [username, setUsername] = useState("");
   useEffect(() => {
-    const fetchUsername = async() => {
-      const name = (await cookies()).get("username")?.value;
-      setUsername(name || "unknown");
-    };
     const fetchRooms = async() => {
       const {data} = await supabase.from("rooms").select("*");
       setRooms(data || []);
     };
-    fetchUsername();
     fetchRooms();
   }, []);
 
   const createRoom = async () => {
     const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({
-        host: username,
-      }),
     });
     const data = await res.json();
     router.push(`/lobby/${data.id}`);
@@ -44,9 +34,9 @@ export default function BrowserPage() {
 //#endregion
 
   const items: BrowserRow[] = [
-    {id: 1, type: "Public", name:"hellofun404", size: 19},
-    {id: 2, type:"Private", name:"secret", size: 5},
-    {id: 3, type:"Public", name: "Henry50194", size:1},
+    {id: 1, type: "Public", host:"hellofun404", size: 19},
+    {id: 2, type:"Private", host:"secret", size: 5},
+    {id: 3, type:"Public", host: "Henry50194", size:1},
   ];
 
   return (

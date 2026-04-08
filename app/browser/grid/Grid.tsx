@@ -12,7 +12,7 @@ export default function Grid({items}: GridProps) {
             {items.map((item) => (
                 <div key={item.id} className="flex items-center p-4 bg-gray-100 justify-start gap-2 border-b border-gray-300">
                     <p className="grow font-semibold truncate text-center">
-                        {item.name}
+                        {item.host}
                     </p>
                     <p>{item.type}</p>
                     <div className="w-px h-6 bg-gray-300 mx-2"></div>

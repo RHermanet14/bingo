@@ -1,11 +1,12 @@
 import {supabase} from "@/lib/supabase";
+import {cookies} from "next/headers";
 
-export async function POST(req: Request) {
-    const {host} = await req.json();
+export async function POST() {
+    const username = (await (cookies())).get("username")?.value || "unknown";
 
     const id = crypto.randomUUID();
     await supabase.from("rooms").insert({
-        id, host,
+        id, host: username, type: 'Public',
     });
     return Response.json({id});
 }
