@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS rooms;
 CREATE TABLE rooms (
 	id uuid PRIMARY KEY,
 	host text,
-	type text,
-    CONSTRAINT isValidType CHECK (type IN ('Public', 'Private')),
+	type text CHECK (type IN ('Public', 'Private')),
+	size INT CHECK (size BETWEEN 0 AND 30),
 	created_at timestamp default now()
 );

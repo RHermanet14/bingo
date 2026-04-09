@@ -10,3 +10,8 @@ export async function POST() {
     });
     return Response.json({id});
 }
+
+export async function GET(){
+    const {data} = await supabase.from("rooms").select("*");
+    return Response.json({data});
+}

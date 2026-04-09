@@ -6,7 +6,7 @@ export async function POST(req: Request) {
         .select("password")
         .eq("id", id)
         .single();
-    return data?.password === password;
+    return Response.json({valid: data?.password === password});
 }
 
 // checks if lobby password = user submitted password

@@ -5,17 +5,11 @@ import { useRouter } from "next/navigation";
 import {useEffect, useState} from "react"
 import {supabase} from "@/lib/supabase"
 
-type Room = {
-  id: string;
-  type: string;
-  host: string;
-}
-
 export default function BrowserPage() {
   const router = useRouter();
 
 //#region new stuff
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<BrowserRow[]>([]);
   useEffect(() => {
     const fetchRooms = async() => {
       const {data} = await supabase.from("rooms").select("*");
@@ -25,19 +19,13 @@ export default function BrowserPage() {
   }, []);
 
   const createRoom = async () => {
-    const res = await fetch("/api/create", {
+    const res = await fetch("/api/browser", {
       method: "POST",
     });
     const data = await res.json();
     router.push(`/lobby/${data.id}`);
   }
 //#endregion
-
-  const items: BrowserRow[] = [
-    {id: 1, type: "Public", host:"hellofun404", size: 19},
-    {id: 2, type:"Private", host:"secret", size: 5},
-    {id: 3, type:"Public", host: "Henry50194", size:1},
-  ];
 
   return (
     <div>
@@ -49,7 +37,7 @@ export default function BrowserPage() {
         <button onClick={() => router.push("/lobby")}
         className="ml-auto bg-gray-500 rounded">Create Lobby</button>
       </div>
-      <Grid items={items}/>
+      <Grid items={rooms}/>
     </div>
   )
 }
