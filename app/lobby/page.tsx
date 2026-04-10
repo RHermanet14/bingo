@@ -1,31 +1,28 @@
 "use client";
-import Grid from "./grid/Grid";
-import {LobbyRow} from "./grid/types"
+
 import { useRouter } from "next/navigation";
 
 export default function LobbyPage() {
     const router = useRouter();
-      const items: LobbyRow[] = [
-        {id: 1, name:"john"},
-        {id: 2, name:"kelly"},
-        {id: 3, name: "crazypineapple808974"},
-        {id: 4, name:"meter"}
-      ];
-    
+
+    const createRoom = async () => {
+        const res = await fetch("/api/browser", {
+        method: "POST",
+        });
+        const data = await res.json();
+        router.replace(`/lobby/${data.id}`);
+    }
+
     return (
         <div>
-            <h1 className="text-2xl text-center p-1 bg-gray-400">Lobby Code: 123456</h1>
-            <div className="bg-gray-200">
-                <div className="p-2 flex gap-4 text-lg">
-                    <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
-                    <p className="ml-auto">1/30</p>
-                    <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
-                </div>
-                <div className="min-h-screen flex flex-col items-center justify-center">
-                    <p>Users in this lobby:</p>
-                    <Grid items={items}/>
-                </div>
+            <h1 className="text-center text-2xl p-1 bg-gray-400">Create room</h1>
+            <button onClick={() => router.replace("/browser")} className="bg-blue-400 rounded">Back To Browser</button>
+            <div className="min-h-screen gap-2 flex flex-col items-center justify-center">
+                <p>{`Password (optional)`}</p>
+                <input className="border border-gray-400 rounded px-3 py-1"></input>
+                <button className="bg-blue-400 rounded" onClick={createRoom}>Create room</button>
             </div>
+            
         </div>
     )
 }

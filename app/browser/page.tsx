@@ -7,9 +7,8 @@ import {supabase} from "@/lib/supabase"
 
 export default function BrowserPage() {
   const router = useRouter();
-
-//#region new stuff
   const [rooms, setRooms] = useState<BrowserRow[]>([]);
+  
   useEffect(() => {
     const fetchRooms = async() => {
       const {data} = await supabase.from("rooms").select("*");
@@ -17,15 +16,6 @@ export default function BrowserPage() {
     };
     fetchRooms();
   }, []);
-
-  const createRoom = async () => {
-    const res = await fetch("/api/browser", {
-      method: "POST",
-    });
-    const data = await res.json();
-    router.push(`/lobby/${data.id}`);
-  }
-//#endregion
 
   return (
     <div>

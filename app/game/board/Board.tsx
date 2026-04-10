@@ -34,6 +34,8 @@ function buildBoard(index: number): number {
 }
 
 export function Board() {
+    enum Outcome {None, Lost, Won};
+    const [outcome, setOutcome] = useState<Outcome>(Outcome.None);
     const [active, setActive] = useState<boolean[]>(
         () => Array.from({ length: 25 }, () => false)
     );
@@ -51,23 +53,38 @@ export function Board() {
         let isBingo: boolean = true;
         while (winConditions.at(index) !== undefined) {
             winConditions[index].forEach(space => {
-                if (!active[space] || !generatedNumbers.includes(space)) // just for now, check if space is active
+                if (!active[space] || !generatedNumbers.includes(space))
                     isBingo = false;
             });
             if (isBingo) {
                 isTimerStopped = true;
-                alert("you win")
+                setOutcome(Outcome.Won);
+                //alert("you won");
                 return true;
             }
             isBingo = true;
             index++;
         }
-        alert("you lose");
+        //alert("you lost");
+        setOutcome(Outcome.Lost);
         return false;
+    }
+
+    const displayOutcome = (): string => {
+        switch (outcome) {
+            case Outcome.Won:
+                return "You Won!";
+            case Outcome.Lost:
+                return "You Lost";
+            case Outcome.None:
+            default:
+                return "";
+        }
     }
 
     return (
         <div>
+            {displayOutcome()}
             <div className="grid grid-cols-5 gap-5 text-center text-3xl border-2 p-4 bg-gray-400">
                 <p>B</p>
                 <p>I</p>
