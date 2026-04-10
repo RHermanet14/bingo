@@ -22,6 +22,7 @@ export default function LobbyPage() {
                     <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
                 </div>
                 <div className="min-h-screen flex flex-col items-center justify-center">
+                    <p>Users in this lobby:</p>
                     <Grid items={items}/>
                 </div>
             </div>

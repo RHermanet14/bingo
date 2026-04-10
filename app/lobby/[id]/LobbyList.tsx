@@ -3,16 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
-type PresenceUser = {
-  username: string;
-};
+import { useRouter } from "next/navigation";
+import Grid from "./grid/Grid"
+import { LobbyRow } from "./grid/types";
 
 export default function LobbyList({username}: {username?:string}) {
+  const router = useRouter();
   const { id } = useParams(); // lobby id from URL
-
-  
-  const [users, setUsers] = useState<string[]>([]);
+  const [users, setUsers] = useState<LobbyRow[]>([]);
 
   // unique session id (important)
   const sessionId = useMemo(() => crypto.randomUUID(), []);
@@ -30,16 +28,12 @@ export default function LobbyList({username}: {username?:string}) {
 
     // listen for updates
     channel.on("presence", { event: "sync" }, () => {
-    const state = channel.presenceState() as Record<string, PresenceUser[]>;
-
-    const allUsers: string[] = [];
-
-    Object.values(state).forEach((entries) => {
-    entries.forEach((entry) => {
-        allUsers.push(entry.username);
-    });
-    });
-
+      const state = channel.presenceState() as Record<string, LobbyRow[]>;
+      const allUsers: LobbyRow[] = Object.values(state).flatMap((entries) =>
+        entries.map((entry) => ({
+          username: entry.username,
+        }))
+      );
       setUsers(allUsers);
     });
 
@@ -56,17 +50,19 @@ export default function LobbyList({username}: {username?:string}) {
   }, [id, username, sessionId]);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Lobby: {id}</h2>
-
-      <p>Users in this lobby:</p>
-
-      {users.map((user, i) => (
-        <div key={i}>
-          {user}
-          {user === username ? " (you)" : ""}
+    <div>
+      <h1 className="text-2xl text-center p-1 bg-gray-400">Lobby Code: 123456</h1>
+      <div className="bg-gray-200">
+        <div className="p-2 flex gap-4 text-lg">
+          <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
+          <p className="ml-auto">1/30</p>
+          <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
+          </div>
+        <div className="min-h-screen flex flex-col items-center justify-center">
+        <p>Users in this lobby:</p>
+        <Grid items={users} username={username}/>
         </div>
-      ))}
+      </div>
     </div>
   );
 }
