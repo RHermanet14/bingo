@@ -11,13 +11,26 @@ export default function LobbyList({username}: {username?:string}) {
   const router = useRouter();
   const { id } = useParams(); // lobby id from URL
   const [users, setUsers] = useState<LobbyRow[]>([]);
+  const [isHost, setHost] = useState(false);
 
+  // Check if it is host's lobby
+  useEffect(() => {
+    const checkHost = async () => {
+      const res = await fetch("/api/validate", {
+        method: "PUT",
+        body: JSON.stringify({id: id, host: username}),
+      });
+      const data = await res.json();
+      setHost(data.valid);
+    }
+    checkHost();
+  },[id, username])
+  
   // unique session id (important)
   const sessionId = useMemo(() => crypto.randomUUID(), []);
 
   useEffect(() => {
     if (!id) return;
-
     const channel = supabase.channel(`lobby:${id}`, {
       config: {
         presence: {
@@ -56,7 +69,11 @@ export default function LobbyList({username}: {username?:string}) {
         <div className="p-2 flex gap-4 text-lg">
           <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
           <p className="ml-auto">1/30</p>
-          <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
+          {
+            isHost ?
+            <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
+            : null
+          }
           </div>
         <div className="min-h-screen flex flex-col items-center justify-center">
         <p>Users in this lobby:</p>
