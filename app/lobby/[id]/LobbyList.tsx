@@ -77,7 +77,7 @@ export default function LobbyList({username}: {username?:string}) {
           </div>
         <div className="min-h-screen flex flex-col items-center justify-center">
         <p>Users in this lobby:</p>
-        <Grid items={users} username={username}/>
+        <Grid items={users} username={username} isHost={isHost}/>
         </div>
       </div>
     </div>
