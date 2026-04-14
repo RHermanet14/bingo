@@ -18,12 +18,12 @@ export default function Page() {
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center">
       <h1 className="text-4xl mb-6">Enter Username</h1>
       <input
-          name="name"
-          placeholder="friendly_user123"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border border-gray-400 rounded px-3 py-1"
-        />
+        name="name"
+        placeholder="friendly_user123"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="border border-gray-400 rounded px-3 py-1"
+      />
         <button
           onClick={handleSubmit}
           className="bg-blue-600 text-white rounded px-4 py-1 hover:bg-blue-700"

@@ -64,9 +64,8 @@ export default function LobbyList({username}: {username?:string}) {
 
   return (
     <div>
-      <h1 className="text-2xl text-center p-1 bg-gray-400">Lobby Code: 123456</h1>
       <div className="bg-gray-200">
-        <div className="p-2 flex gap-4 text-lg">
+        <div className="p-2 flex gap-4 text-lg bg-gray-400">
           <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
           <p className="ml-auto">1/30</p>
           {
@@ -74,7 +73,7 @@ export default function LobbyList({username}: {username?:string}) {
             <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
             : null
           }
-          </div>
+        </div>
         <div className="min-h-screen flex flex-col items-center justify-center">
         <p>Users in this lobby:</p>
         <Grid items={users} username={username} isHost={isHost}/>

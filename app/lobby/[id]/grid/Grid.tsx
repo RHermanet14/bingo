@@ -6,6 +6,7 @@ interface GridProps {
     username?: string;
     isHost: boolean;
 }
+
 export default function Grid({items, username, isHost}: GridProps) {
     return (
         <div className="grid grid-cols-1 border-t border-gray-300">
@@ -24,7 +25,6 @@ export default function Grid({items, username, isHost}: GridProps) {
                         </button>
                         : null
                     }
-                    
                 </div>
             ))}
         </div>
