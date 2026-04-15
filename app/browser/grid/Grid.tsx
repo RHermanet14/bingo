@@ -13,24 +13,49 @@ function checkNeedPassword(type: string): boolean {
 
 export default function Grid({items}: GridProps) {
     const router = useRouter();
-    const [needPassword, setNeedPassword] = useState<boolean>(false);
+    const [needPassword, setNeedPassword] = useState<number>();
+    const [password, setPassword] = useState("");
+    const [invalid, setInvalid] = useState(false);
 
     const onJoinButtonClick = (item: BrowserRow) => {
         const check: boolean = checkNeedPassword(item.type);
-        setNeedPassword(check);
         if (!check) {
             router.push(`/lobby/${item.id}`);
+        } else {
+            setNeedPassword(item.id);
         }
     }
 
     const checkPassword = async() => {
-
+        const res = await fetch("api/validate", {
+            method: "POST",
+            body: JSON.stringify({id:needPassword, password: password}),
+        });
+        const data = await res.json();
+        if (data.valid) {
+            setInvalid(false);
+            router.push(`/lobby/${needPassword}`);
+        } else {
+            setInvalid(true);
+        }
     }
 
     if (needPassword) {
         return (
             <div>
-                <h1>This is where it will ask for a password</h1>
+                <button className="rounded bg-blue-400" onClick={() => setNeedPassword(undefined)}>Back</button>
+                <div className="min-h-screen gap-2 flex flex-col items-center justify-center">
+                    <h1>Enter Lobby Password</h1>
+                    <input
+                        name="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="border border-gray-400 rounded px-3 py-1"
+                    />
+                    <button className="bg-blue-400 rounded" onClick={checkPassword}>Submit</button>
+                    {invalid ? <p>Error, Wrong Password</p> : null}
+                </div>
+                
             </div>
         );
     }
