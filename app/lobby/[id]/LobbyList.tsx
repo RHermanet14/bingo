@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
 import Grid from "./grid/Grid"
 import { LobbyRow } from "./grid/types";
 
@@ -16,7 +15,7 @@ export default function LobbyList({username}: {username?:string}) {
   // Check if it is host's lobby
   useEffect(() => {
     const checkHost = async () => {
-      const res = await fetch("/api/validate", {
+      const res = await fetch("/api/browser", {
         method: "PUT",
         body: JSON.stringify({id: id, host: username}),
       });
