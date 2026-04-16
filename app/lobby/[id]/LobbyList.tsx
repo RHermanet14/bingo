@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Grid from "./grid/Grid"
 import { LobbyRow } from "./grid/types";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 export default function LobbyList({username}: {username?:string}) {
   const router = useRouter();
   const { id } = useParams(); // lobby id from URL
   const [users, setUsers] = useState<LobbyRow[]>([]);
   const [isHost, setHost] = useState(false);
+  const channelRef = useRef<RealtimeChannel>(null);
 
   // Check if it is host's lobby
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function LobbyList({username}: {username?:string}) {
     }
     checkHost();
   },[id, username])
-  
+
   // unique session id (important)
   const sessionId = useMemo(() => crypto.randomUUID(), []);
 
@@ -32,11 +34,11 @@ export default function LobbyList({username}: {username?:string}) {
     if (!id) return;
     const channel = supabase.channel(`lobby:${id}`, {
       config: {
-        presence: {
-          key: sessionId,
-        },
+        presence: { key: sessionId },
+        broadcast: {self: true},
       },
     });
+    channelRef.current = channel;
 
     // listen for updates
     channel.on("presence", { event: "sync" }, () => {
@@ -49,6 +51,10 @@ export default function LobbyList({username}: {username?:string}) {
       setUsers(allUsers);
     });
 
+    channel.on("broadcast", {event: "start_game"}, () => {
+      router.push(`/game/${id}`);
+    });
+
     // join lobby
     channel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
@@ -59,7 +65,21 @@ export default function LobbyList({username}: {username?:string}) {
     return () => {
       channel.unsubscribe();
     };
-  }, [id, username, sessionId]);
+  }, [id, username, sessionId, router]);
+
+  const start_game = async () => {
+    if (!isHost) return;
+    const res = await fetch("/api/browser", {
+        method: "PUT",
+        body: JSON.stringify({id: id, host: username}),
+      });
+    const data = await res.json();
+    if (!data.valid) return;
+    channelRef.current?.send({
+      type:"broadcast",
+      event:"start_game",
+    });
+  };
 
   return (
     <div>
@@ -69,7 +89,7 @@ export default function LobbyList({username}: {username?:string}) {
           <p className="ml-auto">1/30</p>
           {
             isHost ?
-            <button onClick={() => router.replace("/game")} className="bg-blue-400">Start Game</button>
+            <button onClick={() => start_game()} className="bg-blue-400">Start Game</button>
             : null
           }
         </div>
