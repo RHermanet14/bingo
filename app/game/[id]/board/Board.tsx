@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import {useParams} from "next/navigation";
+import {supabase} from "@/lib/supabase"
 
 const boardNumbers: number[] = []; // represents user's board
 const winConditions: number[][] = [ // list of win conditions
@@ -129,6 +131,23 @@ function convertToBingoNumber(num: number): string {
 export function Timer() {
     const [letterNum, setLetterNum] = useState("");
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const {id} = useParams();
+
+    useEffect(() => {
+        if(!id) return;
+        const channel = supabase.channel(`game:${id}`, {
+            config: {
+                broadcast:{self:true},
+            },
+        });
+        channel.on("broadcast", {event: "getRandomNumber"}, (payload) => {
+            console.log(payload);
+        });
+        channel.subscribe();
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    },[id]);
 
     function stopTimer() {
         if (intervalRef.current) {
