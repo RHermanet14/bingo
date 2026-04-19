@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams} from "next/navigation";
 import {supabase} from "@/lib/supabase"
 
+//#region Global variables
 const boardNumbers: number[] = []; // represents user's board
 const winConditions: number[][] = [ // list of win conditions
     [0,1,2,3,4], // rows
@@ -23,6 +24,7 @@ const generatedNumbers: number[] = []; // list of numbers already called
 
 let isTimerStopped: boolean = false;
 const bingoNumberInterval: number = 3000;
+//#endregion
 
 function generateBoardNumber(letter: number): number {
     return Math.floor(Math.random() * 15) + (letter * 15) + 1;
@@ -110,7 +112,6 @@ export function Timer() {
     const [letterNum, setLetterNum] = useState("");
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const {id} = useParams();
-    const [isHost, setHost] = useState(false);
 
     type RandomNumberPayload = {
         seed: number;
@@ -152,15 +153,20 @@ export function Timer() {
             setPayloadInfo(msg.payload);
         });
         channel.subscribe();
-        const checkHost = async () => {
-            const res = await fetch("/api/browser", {
-                method: "PUT",
-                body: JSON.stringify({id: id, host: username}),
-            });
-            const data = await res.json();
-            setHost(data.valid);
-        }
+
         const generateSeed = async () => {
+            const usernameRes = await fetch("/api/username", {
+                method: "GET"
+            });
+            const usernameData = await usernameRes.json();
+
+            const checkHostRes = await fetch("/api/browser", {
+                method: "PUT",
+                body: JSON.stringify({id: id, host: usernameData.username}),
+            });
+            const checkHostData = await checkHostRes.json();
+            if (!checkHostData.valid) return; // return if not host
+
             const res = await fetch("/api/game", {
                 method: "GET"
             });
@@ -172,14 +178,11 @@ export function Timer() {
                 payload: payload,
             });
         }
-        checkHost();
-        if (isHost) {
-            generateSeed();
-        }
+        generateSeed();
         return () => {
             supabase.removeChannel(channel);
         };
-    },[id, isHost]);
+    },[id]);
 
     function stopTimer() {
         if (intervalRef.current) {
