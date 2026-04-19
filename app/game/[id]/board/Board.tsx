@@ -106,32 +106,40 @@ export function Board() {
     );
 }
 
-function getRandomBingoNumber(): number {
-    if (remainingBingoNumbers.length === 0)
-        return -1;
-    const index: number =  Math.floor(Math.random() * remainingBingoNumbers.length);
-    const removedElement = remainingBingoNumbers.splice(index, 1);
-    return removedElement[0];
-}
-
-function convertToBingoNumber(num: number): string {
-    const numString: string = num.toString();
-    if (num < 16)
-        return "B" + numString; 
-    else if (num < 31)
-        return "I" + numString;
-    else if (num < 46)
-        return "N" + numString;
-    else if (num < 61)
-        return "G" + numString;
-    else
-        return "O" + numString;
-}
-
 export function Timer() {
     const [letterNum, setLetterNum] = useState("");
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const {id} = useParams();
+    const [isHost, setHost] = useState(false);
+
+    type RandomNumberPayload = {
+        seed: number;
+        startTime: number;
+    };
+    const [payloadInfo, setPayloadInfo] = useState<RandomNumberPayload>();
+
+    const getRandomBingoNumber = useCallback((): number => {
+        if (remainingBingoNumbers.length === 0 || !payloadInfo)
+            return -1;
+        const tick = Math.floor((Date.now() - payloadInfo.startTime) / bingoNumberInterval);
+        const index: number =  (payloadInfo.seed + tick * 17) % remainingBingoNumbers.length;
+        const removedElement = remainingBingoNumbers.splice(index, 1);
+        return removedElement[0];
+    }, [payloadInfo]);
+
+    function convertToBingoNumber(num: number): string {
+        const numString: string = num.toString();
+        if (num < 16)
+            return "B" + numString; 
+        else if (num < 31)
+            return "I" + numString;
+        else if (num < 46)
+            return "N" + numString;
+        else if (num < 61)
+            return "G" + numString;
+        else
+            return "O" + numString;
+    }
 
     useEffect(() => {
         if(!id) return;
@@ -140,14 +148,38 @@ export function Timer() {
                 broadcast:{self:true},
             },
         });
-        channel.on("broadcast", {event: "getRandomNumber"}, (payload) => {
-            console.log(payload);
+        channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
+            setPayloadInfo(msg.payload);
         });
         channel.subscribe();
+        const checkHost = async () => {
+            const res = await fetch("/api/browser", {
+                method: "PUT",
+                body: JSON.stringify({id: id, host: username}),
+            });
+            const data = await res.json();
+            setHost(data.valid);
+        }
+        const generateSeed = async () => {
+            const res = await fetch("/api/game", {
+                method: "GET"
+            });
+            const data = await res.json();
+            const payload: RandomNumberPayload = {seed:data.seed, startTime: data.startTime};
+            channel.send({
+                type: "broadcast",
+                event: "setSeed",
+                payload: payload,
+            });
+        }
+        checkHost();
+        if (isHost) {
+            generateSeed();
+        }
         return () => {
             supabase.removeChannel(channel);
         };
-    },[id]);
+    },[id, isHost]);
 
     function stopTimer() {
         if (intervalRef.current) {
@@ -165,7 +197,7 @@ export function Timer() {
             const str: string = convertToBingoNumber(num);
             setLetterNum(str);
         }
-    }, []);
+    }, [getRandomBingoNumber]);
 
     useEffect(() => {
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
