@@ -112,24 +112,30 @@ export function Timer() {
     const [letterNum, setLetterNum] = useState("");
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const {id} = useParams();
+    const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
+        NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
+        EmptyArray = -1, // Return if the remainingBingoNumbers array is empty
+    };
 
     type RandomNumberPayload = {
         seed: number;
         startTime: number;
     };
-    const [payloadInfo, setPayloadInfo] = useState<RandomNumberPayload>();
+    const [payloadInfo, setPayloadInfo] = useState<RandomNumberPayload | null>(null);
 
     const getRandomBingoNumber = useCallback((): number => {
-        if (remainingBingoNumbers.length === 0 || !payloadInfo)
-            return -1;
+        if (!payloadInfo)
+            return IntervalReturns.NullPayload;
+        if (remainingBingoNumbers.length === 0)
+            return IntervalReturns.EmptyArray;
         const tick = Math.floor((Date.now() - payloadInfo.startTime) / bingoNumberInterval);
         const index: number =  (payloadInfo.seed + tick * 17) % remainingBingoNumbers.length;
         const removedElement = remainingBingoNumbers.splice(index, 1);
         return removedElement[0];
-    }, [payloadInfo]);
+    }, [payloadInfo, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
 
     function convertToBingoNumber(num: number): string {
-        const numString: string = num.toString();
+        const numString: string = (num + 1).toString(); // Add 1 to make num = 1 - 75
         if (num < 16)
             return "B" + numString; 
         else if (num < 31)
@@ -192,15 +198,17 @@ export function Timer() {
     }
 
     const setBingoNumber = useCallback(() => {
-        const num: number = getRandomBingoNumber() + 1;
-        if (num <= 0 || isTimerStopped) {
-            stopTimer();
+        const num: number = getRandomBingoNumber();
+        if (num === IntervalReturns.NullPayload)
+            return; // Don't stop timer if setSeed hasn't been broadcasted yet
+        if (num === IntervalReturns.EmptyArray || isTimerStopped) {
+            stopTimer(); // Stop timer if no more remaining Bingo numbers or someone has called Bingo
         } else {
             generatedNumbers.push(num);
             const str: string = convertToBingoNumber(num);
             setLetterNum(str);
         }
-    }, [getRandomBingoNumber]);
+    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
 
     useEffect(() => {
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
