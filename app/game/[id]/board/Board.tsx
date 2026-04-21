@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams} from "next/navigation";
 import {supabase} from "@/lib/supabase"
+import {initChannel, getChannel, removeChannel} from "@/lib/channelManager"
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 //#region Global variables
 const boardNumbers: number[] = []; // represents user's board
@@ -51,7 +53,7 @@ export function Board() {
     const placeChip = (index: number) => {
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
     };
-    
+
     const callBingo = (): boolean => {
         let index: number = 0;
         let isBingo: boolean = true;
@@ -61,15 +63,16 @@ export function Board() {
                     isBingo = false;
             });
             if (isBingo) {
-                isTimerStopped = true;
                 setOutcome(Outcome.Won);
-                //alert("you won");
+                channelRef.current?.send({
+                    type:"broadcast",
+                    event:"winGame"
+                });
                 return true;
             }
             isBingo = true;
             index++;
         }
-        //alert("you lost");
         setOutcome(Outcome.Lost);
         return false;
     }
@@ -85,6 +88,20 @@ export function Board() {
                 return "";
         }
     }
+
+    const channelRef = useRef<RealtimeChannel>(null);
+    
+    useEffect(() => {
+        const channel = getChannel();
+        channelRef.current = channel;
+        channel?.on("broadcast", {event:"winGame"}, () => {
+            // set win message to name of player than won
+            if (outcome !== Outcome.Won) {
+                setOutcome(Outcome.Lost);
+            }
+            isTimerStopped = true;
+        });
+    });
 
     return (
         <div>
@@ -109,9 +126,11 @@ export function Board() {
 }
 
 export function Timer() {
+    //#region timer variables
     const [letterNum, setLetterNum] = useState("");
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const {id} = useParams();
+    
     const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
         NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
         EmptyArray = -1, // Return if the remainingBingoNumbers array is empty
@@ -122,6 +141,7 @@ export function Timer() {
         startTime: number;
     };
     const [payloadInfo, setPayloadInfo] = useState<RandomNumberPayload | null>(null);
+    //#endregion
 
     const getRandomBingoNumber = useCallback((): number => {
         if (!payloadInfo)
@@ -148,13 +168,17 @@ export function Timer() {
             return "O" + numString;
     }
 
+    function stopTimer() {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+    }
+
     useEffect(() => {
         if(!id) return;
-        const channel = supabase.channel(`game:${id}`, {
-            config: {
-                broadcast:{self:true},
-            },
-        });
+        const channel = initChannel(id.toString());
+        
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
         });
@@ -186,16 +210,10 @@ export function Timer() {
         }
         generateSeed();
         return () => {
-            supabase.removeChannel(channel);
+            removeChannel(); // might be too aggressive
+            //channel.unsubscribe();
         };
     },[id]);
-
-    function stopTimer() {
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-        }
-    }
 
     const setBingoNumber = useCallback(() => {
         const num: number = getRandomBingoNumber();
