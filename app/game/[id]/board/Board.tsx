@@ -156,11 +156,11 @@ export function Timer() {
         const tick = Math.floor((Date.now() - payloadInfo.startTime) / bingoNumberInterval);
         const index: number =  (payloadInfo.seed + tick * 17) % remainingBingoNumbers.length;
         const removedElement = remainingBingoNumbers.splice(index, 1);
-        return removedElement[0];
+        return removedElement[0] + 1;
     }, [payloadInfo, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
 
     function convertToBingoNumber(num: number): string {
-        const numString: string = (num + 1).toString(); // Add 1 to make num = 1 - 75
+        const numString: string = num.toString();
         if (num < 16)
             return "B" + numString; 
         else if (num < 31)
