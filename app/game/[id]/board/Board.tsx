@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams} from "next/navigation";
-import {supabase} from "@/lib/supabase"
 import {initChannel, getChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
 
@@ -26,18 +25,8 @@ const generatedNumbers: number[] = []; // list of numbers already called
 
 let isTimerStopped: boolean = false;
 const bingoNumberInterval: number = 3000;
+let username: string = "";
 //#endregion
-
-function generateBoardNumber(letter: number): number {
-    return Math.floor(Math.random() * 15) + (letter * 15) + 1;
-};
-
-function buildBoard(index: number): number {
-        let space: number = generateBoardNumber(index%5);
-        while(boardNumbers.includes(space)) {space = generateBoardNumber(index%5);}
-        boardNumbers.push(space);
-        return space;
-}
 
 export function Board() {
     enum Outcome {None, Lost, Won};
@@ -46,6 +35,17 @@ export function Board() {
         () => Array.from({ length: 25 }, () => false)
     );
     
+    function generateBoardNumber(letter: number): number {
+        return Math.floor(Math.random() * 15) + (letter * 15) + 1;
+    };
+
+    function buildBoard(index: number): number {
+        let space: number = generateBoardNumber(index%5);
+        while(boardNumbers.includes(space)) {space = generateBoardNumber(index%5);}
+        boardNumbers.push(space);
+        return space;
+    }
+
     const [bingoNumbers] = useState<number[]>(
         () => Array.from({length: 25}, (_, i) => buildBoard(i))
     );
@@ -54,19 +54,26 @@ export function Board() {
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
     };
 
+    function validNum(space: number): boolean {
+        if (space === 12)
+            return true;
+        return generatedNumbers.includes(boardNumbers[space]);
+    }
+
     const callBingo = (): boolean => {
         let index: number = 0;
         let isBingo: boolean = true;
         while (winConditions.at(index) !== undefined) {
             winConditions[index].forEach(space => {
-                if (!active[space] || !generatedNumbers.includes(space))
+                if (!active[space] || !validNum)
                     isBingo = false;
             });
             if (isBingo) {
                 setOutcome(Outcome.Won);
                 channelRef.current?.send({
                     type:"broadcast",
-                    event:"winGame"
+                    event:"winGame",
+                    username: username,
                 });
                 return true;
             }
@@ -94,11 +101,9 @@ export function Board() {
     useEffect(() => {
         const channel = getChannel();
         channelRef.current = channel;
-        channel?.on("broadcast", {event:"winGame"}, () => {
+        channel?.on("broadcast", {event:"winGame"}, (msg: {payload: {username:string}}) => {
             // set win message to name of player than won
-            if (outcome !== Outcome.Won) {
-                setOutcome(Outcome.Lost);
-            }
+            console.log(msg.payload.username, " has won the game!");
             isTimerStopped = true;
         });
     });
@@ -189,7 +194,7 @@ export function Timer() {
                 method: "GET"
             });
             const usernameData = await usernameRes.json();
-
+            username = usernameData.username;
             const checkHostRes = await fetch("/api/browser", {
                 method: "PUT",
                 body: JSON.stringify({id: id, host: usernameData.username}),
