@@ -25,7 +25,6 @@ const generatedNumbers: number[] = []; // list of numbers already called
 
 let isTimerStopped: boolean = false;
 const bingoNumberInterval: number = 3000;
-let username: string = "";
 //#endregion
 
 export function Board() {
@@ -34,6 +33,7 @@ export function Board() {
     const [active, setActive] = useState<boolean[]>(
         () => Array.from({ length: 25 }, () => false)
     );
+    const [username, setUsername] = useState<string>("");
     
     function generateBoardNumber(letter: number): number {
         return Math.floor(Math.random() * 15) + (letter * 15) + 1;
@@ -73,7 +73,7 @@ export function Board() {
                 channelRef.current?.send({
                     type:"broadcast",
                     event:"winGame",
-                    username: username,
+                    payload: {message: username}
                 });
                 return true;
             }
@@ -101,11 +101,19 @@ export function Board() {
     useEffect(() => {
         const channel = getChannel();
         channelRef.current = channel;
-        channel?.on("broadcast", {event:"winGame"}, (msg: {payload: {username:string}}) => {
+        channel?.on("broadcast", {event:"winGame"}, ({payload}) => {
             // set win message to name of player than won
-            console.log(msg.payload.username, " has won the game!");
+            console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
+        const getUsername = async() => {
+            const usernameRes = await fetch("/api/username", {
+                method: "GET"
+            });
+            const usernameData = await usernameRes.json();
+            setUsername(usernameData.username);
+        }
+        getUsername();
     });
 
     return (
@@ -194,7 +202,6 @@ export function Timer() {
                 method: "GET"
             });
             const usernameData = await usernameRes.json();
-            username = usernameData.username;
             const checkHostRes = await fetch("/api/browser", {
                 method: "PUT",
                 body: JSON.stringify({id: id, host: usernameData.username}),
