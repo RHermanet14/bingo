@@ -34,6 +34,7 @@ export function Board() {
         () => Array.from({ length: 25 }, () => false)
     );
     const [username, setUsername] = useState<string>("");
+    const [winner, setWinner] = useState<string>("");
     
     function generateBoardNumber(letter: number): number {
         return Math.floor(Math.random() * 15) + (letter * 15) + 1;
@@ -87,9 +88,11 @@ export function Board() {
     const displayOutcome = (): string => {
         switch (outcome) {
             case Outcome.Won:
-                return "You Won!";
+                return `${winner} has won the game!`;
             case Outcome.Lost:
-                return "You Lost";
+                if (winner.trim.length === 0)
+                    return "You Lost";
+                return `${winner} has won the game!`;
             case Outcome.None:
             default:
                 return "";
@@ -103,6 +106,7 @@ export function Board() {
         channelRef.current = channel;
         channel?.on("broadcast", {event:"winGame"}, ({payload}) => {
             // set win message to name of player than won
+            setWinner(payload.message);
             console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
