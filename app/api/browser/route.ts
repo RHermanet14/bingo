@@ -8,11 +8,11 @@ export async function POST(req: Request) {
 
     if (password === null || password.trim().length === 0) {
         await supabase.from("rooms").insert({
-            id, host: username, type: 'Public',
+            id, host: username, type: 'Public', size: 1,
         });
     } else {
         await supabase.from("rooms").insert({
-            id, host: username, type: 'Private', password: password,
+            id, host: username, type: 'Private', password: password, size:1,
         });
     }
 

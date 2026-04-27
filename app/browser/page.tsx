@@ -23,7 +23,7 @@ export default function BrowserPage() {
       <div className="flex bg-gray-400 p-1 gap-2">
         <p>Search</p>
         <input placeholder="Enter Lobby Code" className="bg-white"/>
-        <button className="bg-gray-500 rounded">Refresh</button>
+        <button className="bg-gray-500 rounded" onClick={() => router.refresh()}>Refresh</button>
         <button onClick={() => router.push("/lobby")}
         className="ml-auto bg-gray-500 rounded">Create Lobby</button>
       </div>
