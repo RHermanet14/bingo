@@ -61,9 +61,24 @@ export default function LobbyList({username}: {username?:string}) {
         await channel.track({ username });
       }
     });
-
+    const increaseSize = async() => {
+      const res = await fetch("/api/validate", {
+        method: "PUT",
+        body: JSON.stringify({id: id, amount: 1})   
+      });
+      console.log("increase size count: ", res);
+    }
+    increaseSize();
     return () => {
       channel.unsubscribe();
+      const decreaseSize = async() => {
+        const res = await fetch("/api/validate", {
+          method: "PUT",
+          body: JSON.stringify({id: id, amount: -1})   
+        });
+       console.log("decrease size count: ", res);
+      }
+      decreaseSize();
     };
   }, [id, username, sessionId, router]);
 
