@@ -101,7 +101,7 @@ export default function LobbyList({username}: {username?:string}) {
       <div className="bg-gray-200">
         <div className="p-2 flex gap-4 text-lg bg-gray-400">
           <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
-          <p className="ml-auto">1/30</p>
+          <p className="ml-auto">{users.length}/30</p>
           {
             isHost ?
             <button onClick={() => start_game()} className="bg-blue-400">Start Game</button>
