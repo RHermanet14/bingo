@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import {initChannel, getChannel, removeChannel} from "@/lib/channelManager"
 import Grid from "./grid/Grid"
 import { LobbyRow } from "./grid/types";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { getuserId } from "@/lib/localVars";
 
-export default function LobbyList({username}: {username?:string}) {
+export default function LobbyList({username}: {username:string}) {
   const router = useRouter();
   const { id } = useParams(); // lobby id from URL
   const [users, setUsers] = useState<LobbyRow[]>([]);
@@ -27,17 +28,11 @@ export default function LobbyList({username}: {username?:string}) {
     checkHost();
   },[id, username])
 
-  // unique session id (important)
-  const sessionId = useMemo(() => crypto.randomUUID(), []);
-
   useEffect(() => {
     if (!id) return;
-    const channel = supabase.channel(`lobby:${id}`, {
-      config: {
-        presence: { key: sessionId },
-        broadcast: {self: true},
-      },
-    });
+
+    const userId = getuserId();
+    const channel = initChannel(id.toString(), userId, username);
     channelRef.current = channel;
 
     // listen for updates
@@ -55,12 +50,6 @@ export default function LobbyList({username}: {username?:string}) {
       router.push(`/game/${id}`);
     });
 
-    // join lobby
-    channel.subscribe(async (status) => {
-      if (status === "SUBSCRIBED") {
-        await channel.track({ username });
-      }
-    });
     const increaseSize = async() => {
       const res = await fetch("/api/validate", {
         method: "PUT",
@@ -69,6 +58,7 @@ export default function LobbyList({username}: {username?:string}) {
       console.log("increase size count: ", res);
     }
     increaseSize();
+
     return () => {
       channel.unsubscribe();
       const decreaseSize = async() => {
@@ -80,7 +70,7 @@ export default function LobbyList({username}: {username?:string}) {
       }
       decreaseSize();
     };
-  }, [id, username, sessionId, router]);
+  }, [id, username, router]);
 
   const start_game = async () => {
     if (!isHost) return;

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams} from "next/navigation";
-import {initChannel, getChannel, removeChannel} from "@/lib/channelManager"
+import {getChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
 
 //#region Global variables
@@ -103,8 +103,9 @@ export function Board() {
     
     useEffect(() => {
         const channel = getChannel();
+        if(!channel) return;
         channelRef.current = channel;
-        channel?.on("broadcast", {event:"winGame"}, ({payload}) => {
+        channel.on("broadcast", {event:"winGame"}, ({payload}) => {
             // set win message to name of player than won
             setWinner(payload.message);
             console.log(payload.message, " has won the game!");
@@ -194,12 +195,12 @@ export function Timer() {
 
     useEffect(() => {
         if(!id) return;
-        const channel = initChannel(id.toString());
+        const channel = getChannel();
+        if(!channel) return;
         
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
         });
-        channel.subscribe();
 
         const generateSeed = async () => {
             const usernameRes = await fetch("/api/username", {
