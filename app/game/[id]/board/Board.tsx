@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams} from "next/navigation";
-import {getChannel, removeChannel} from "@/lib/channelManager"
+import {getChannel, initChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { getuserId } from "@/lib/localVars";
 
 //#region Global variables
 const boardNumbers: number[] = []; // represents user's board
@@ -102,8 +103,9 @@ export function Board() {
     const channelRef = useRef<RealtimeChannel>(null);
     
     useEffect(() => {
-        const channel = getChannel();
-        if(!channel) return;
+        const userId = getuserId();
+
+        const channel = initChannel(userId, username);
         channelRef.current = channel;
         channel.on("broadcast", {event:"winGame"}, ({payload}) => {
             // set win message to name of player than won
@@ -111,6 +113,9 @@ export function Board() {
             console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
+
+        channel.subscribe();
+
         const getUsername = async() => {
             const usernameRes = await fetch("/api/username", {
                 method: "GET"

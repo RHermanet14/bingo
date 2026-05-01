@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {initChannel, getChannel, removeChannel} from "@/lib/channelManager"
 import Grid from "./grid/Grid"
-import { LobbyRow } from "./grid/types";
+import { LobbyRow} from "./grid/types";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { getuserId } from "@/lib/localVars";
+import { supabase } from "@/lib/supabase";
 
 export default function LobbyList({username}: {username:string}) {
   const router = useRouter();
@@ -32,24 +32,30 @@ export default function LobbyList({username}: {username:string}) {
     if (!id) return;
 
     const userId = getuserId();
-    const channel = initChannel(id.toString(), userId, username);
-    channelRef.current = channel;
 
+    const channel = supabase.channel(`room-${id}`, {
+      config: {
+        broadcast:{self:true},
+        presence:{key: userId}
+      },
+    });
+    channelRef.current = channel;
+    
     // listen for updates
     channel.on("presence", { event: "sync" }, () => {
-      const state = channel.presenceState() as Record<string, LobbyRow[]>;
-      const allUsers: LobbyRow[] = Object.values(state).flatMap((entries) =>
-        entries.map((entry) => ({
-          username: entry.username,
-        }))
-      );
-      setUsers(allUsers);
+      const users = Object.values(channel.presenceState() as Record<string, LobbyRow[]>).flat();
+      setUsers(users);
     });
-
     channel.on("broadcast", {event: "start_game"}, () => {
       router.push(`/game/${id}`);
     });
 
+    channel.subscribe((status) => {
+      if(status === "SUBSCRIBED") {
+        channel.track({userId, username});
+      }
+    });
+    
     const increaseSize = async() => {
       const res = await fetch("/api/validate", {
         method: "PUT",
@@ -60,7 +66,7 @@ export default function LobbyList({username}: {username:string}) {
     increaseSize();
 
     return () => {
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
       const decreaseSize = async() => {
         const res = await fetch("/api/validate", {
           method: "PUT",
