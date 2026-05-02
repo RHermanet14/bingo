@@ -1,5 +1,8 @@
 "use client";
+import { useEffect, useRef } from "react";
 import { LobbyRow } from "./types";
+import { getChannel } from "@/lib/channelManager";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 interface GridProps {
     items: LobbyRow[];
@@ -8,6 +11,22 @@ interface GridProps {
 }
 
 export default function Grid({items, username, isHost}: GridProps) {
+    const channelRef = useRef<RealtimeChannel>(null);
+    useEffect(() => {
+        const channel = getChannel();
+        channelRef.current = channel;
+    })
+    const kick_player = (userId: string) => {
+        if (channelRef.current === null) {
+            console.log("Error: channelRef.current is null when kick_player is called.");
+            return;
+        }
+        channelRef.current.send({
+            type:"broadcast",
+            event:"kick_player", // send the user id
+            payload: {userId: userId},
+        });
+    }
     return (
         <div className="grid grid-cols-1 border-t border-gray-300">
             {items.map((item, i) => (
@@ -19,7 +38,7 @@ export default function Grid({items, username, isHost}: GridProps) {
                     {
                         isHost && item.username !== username ?
                         <button
-                            onClick={() => alert(`kicking ${item.username}...`)}
+                            onClick={() => kick_player(item.userId)}
                             className="bg-blue-400 rounded text-lg px-4 font-semibold">
                             Kick Player
                         </button>
