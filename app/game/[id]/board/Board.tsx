@@ -129,7 +129,7 @@ export function Board() {
 
     return (
         <div>
-            {displayOutcome()}
+            <h1 className="flex items-center justify-center text-4xl mb-10 font-bold rounded">{displayOutcome()}</h1>
             <div className="grid grid-cols-5 gap-5 text-center text-3xl border-2 p-4 bg-gray-400">
                 <p>B</p>
                 <p>I</p>
