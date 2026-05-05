@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import {useParams} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import {getChannel, initChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { getuserId } from "@/lib/localVars";
@@ -30,6 +30,7 @@ const bingoNumberInterval: number = 3000;
 
 export function Board() {
     enum Outcome {None, Lost, Won};
+    const router = useRouter();
     const [outcome, setOutcome] = useState<Outcome>(Outcome.None);
     const [active, setActive] = useState<boolean[]>(
         () => Array.from({ length: 25 }, () => false)
@@ -143,7 +144,20 @@ export function Board() {
                     </button>
                 ))}
             </div>
-            <button onClick={callBingo}>Call Bingo</button>
+            <button className="bg-yellow-300 mt-1 rounded text-4xl font-bold" onClick={callBingo}>Call Bingo</button>
+
+            {
+                outcome === Outcome.None ? null :
+                <div className="flex items-center justify-center text-4xl mt-20">
+                    
+                    <button 
+                        onClick={() => router.replace("/browser")}
+                        className="bg-blue-400 rounded"
+                    >
+                        Return to Browser
+                    </button>
+                </div>
+            }
         </div>    
     );
 }
