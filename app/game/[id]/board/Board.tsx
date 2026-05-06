@@ -68,7 +68,7 @@ export function Board() {
         let isBingo: boolean = true;
         while (winConditions.at(index) !== undefined) {
             winConditions[index].forEach(space => {
-                if (!active[space] || !validNum)
+                if (!active[space] || !validNum(space))
                     isBingo = false;
             });
             if (isBingo) {
