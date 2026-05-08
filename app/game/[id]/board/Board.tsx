@@ -104,6 +104,17 @@ export function Board() {
     const channelRef = useRef<RealtimeChannel>(null);
     
     useEffect(() => {
+        const getUsername = async() => {
+            const usernameRes = await fetch("/api/username", {
+                method: "GET"
+            });
+            const usernameData = await usernameRes.json();
+            setUsername(usernameData.username);
+        }
+        getUsername();
+    }, []);
+
+    useEffect(() => {
         const userId = getuserId();
 
         const channel = initChannel(userId, username);
@@ -114,17 +125,7 @@ export function Board() {
             console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
-
         channel.subscribe();
-
-        const getUsername = async() => {
-            const usernameRes = await fetch("/api/username", {
-                method: "GET"
-            });
-            const usernameData = await usernameRes.json();
-            setUsername(usernameData.username);
-        }
-        getUsername();
     });
 
     return (
