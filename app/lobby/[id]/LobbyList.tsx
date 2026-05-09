@@ -104,6 +104,14 @@ export default function LobbyList({username}: {username:string}) {
             : null
           }
         </div>
+        <div>
+          <h1 className="font-bold text-3xl bg-gray-300 justify-center items-center flex">Settings:</h1>
+          <div>
+            <input type="text" placeholder="Time:"/>
+            <input type="text" placeholder="Board Size:"/>
+            <input type="text" placeholder="Win Conditions (5 in a row, corners, whole board):"/>
+          </div>
+        </div>
         <div className="min-h-screen flex flex-col items-center justify-center">
         <p>Users in this lobby:</p>
         <Grid items={users} username={username} isHost={isHost}/>
