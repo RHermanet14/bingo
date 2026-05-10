@@ -159,40 +159,40 @@ export default function LobbyList({username}: {username:string}) {
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="boardChoice"
                 value="option1"
-                checked={time === "option1"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={boardSize === "option1"}
+                onChange={(e) => setBoardSize(e.target.value)}
               />
               5 x 5
             </label>
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="boardChoice"
                 value="option2"
-                checked={time === "option2"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={boardSize === "option2"}
+                onChange={(e) => setBoardSize(e.target.value)}
               />
               3 x 3
             </label>
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="boardChoice"
                 value="option3"
-                checked={time === "option3"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={boardSize === "option3"}
+                onChange={(e) => setBoardSize(e.target.value)}
               />
               7 x 7
             </label>
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="boardChoice"
                 value="option4"
-                checked={time === "option4"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={boardSize === "option4"}
+                onChange={(e) => setBoardSize(e.target.value)}
               />
               9 x 9
             </label>
@@ -203,44 +203,45 @@ export default function LobbyList({username}: {username:string}) {
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="winChoice"
                 value="option1"
-                checked={time === "option1"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={winConditions === "option1"}
+                onChange={(e) => setWinConditions(e.target.value)}
               />
               1 Line
             </label>
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="winChoice"
                 value="option2"
-                checked={time === "option2"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={winConditions === "option2"}
+                onChange={(e) => setWinConditions(e.target.value)}
               />
               2 Lines
             </label>
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="winChoice"
                 value="option3"
-                checked={time === "option3"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={winConditions === "option3"}
+                onChange={(e) => setWinConditions(e.target.value)}
               />
               Four Corners
             </label>
             <label>
               <input
                 type="radio"
-                name="timeChoice"
+                name="winChoice"
                 value="option4"
-                checked={time === "option4"}
-                onChange={(e) => setTime(e.target.value)}
+                checked={winConditions === "option4"}
+                onChange={(e) => setWinConditions(e.target.value)}
               />
               Blackout
             </label>
           </div>
+
         </div>
         <div className="min-h-screen flex flex-col items-center justify-center">
         <p>Users in this lobby:</p>
