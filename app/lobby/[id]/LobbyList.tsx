@@ -92,6 +92,10 @@ export default function LobbyList({username}: {username:string}) {
     });
   };
 
+  const [time, setTime] = useState("option1");
+  const [boardSize, setBoardSize] = useState("option1");
+  const [winConditions, setWinConditions] = useState("option1");
+
   return (
     <div>
       <div className="bg-gray-200">
@@ -106,10 +110,136 @@ export default function LobbyList({username}: {username:string}) {
         </div>
         <div>
           <h1 className="font-bold text-3xl bg-gray-300 justify-center items-center flex">Settings:</h1>
-          <div>
-            <input type="text" placeholder="Time:"/>
-            <input type="text" placeholder="Board Size:"/>
-            <input type="text" placeholder="Win Conditions (5 in a row, corners, whole board):"/>
+          <div className="flex flex-col">
+            <h1>Time:</h1>
+            <label>
+              <input
+                type="radio"
+                name="choice"
+                value="option1"
+                checked={time === "option1"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              5 Seconds
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option2"
+                checked={time === "option2"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              10 Seconds
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option3"
+                checked={time === "option3"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              3 Seconds
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option4"
+                checked={time === "option4"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              1 Second
+            </label>
+          </div>
+
+          <div className="flex flex-col">
+            <h1>Board Size:</h1>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option1"
+                checked={time === "option1"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              5 x 5
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option2"
+                checked={time === "option2"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              3 x 3
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option3"
+                checked={time === "option3"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              7 x 7
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option4"
+                checked={time === "option4"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              9 x 9
+            </label>
+          </div>
+
+          <div className="flex flex-col">
+            <h1>Win Conditions:</h1>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option1"
+                checked={time === "option1"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              1 Line
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option2"
+                checked={time === "option2"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              2 Lines
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option3"
+                checked={time === "option3"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              Four Corners
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="timeChoice"
+                value="option4"
+                checked={time === "option4"}
+                onChange={(e) => setTime(e.target.value)}
+              />
+              Blackout
+            </label>
           </div>
         </div>
         <div className="min-h-screen flex flex-col items-center justify-center">
