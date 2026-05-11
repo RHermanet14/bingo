@@ -115,7 +115,7 @@ export default function LobbyList({username}: {username:string}) {
             <label>
               <input
                 type="radio"
-                name="choice"
+                name="timeChoice"
                 value="option1"
                 checked={time === "option1"}
                 onChange={(e) => setTime(e.target.value)}

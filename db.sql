@@ -5,8 +5,12 @@ CREATE TABLE rooms (
 	type text CHECK (type IN ('Public', 'Private')),
 	password text,
 	size INT CHECK (size BETWEEN 0 AND 30),
+  state text CHECK (type IN ('Pending', 'Started', 'Finished')) default 'Pending',
+  settings INT default 111, -- Each digit represents the option number
 	created_at timestamp default now()
 );
+
+DELETE FROM rooms WHERE state = 'Finished';
 
 -- Supabase enables RLS by default on tables exposed via the API.
 -- The app uses the anon key on both client and server, so policies must
