@@ -3,14 +3,16 @@ import Grid from "./grid/Grid";
 import {BrowserRow} from "./grid/types"
 import { useRouter } from "next/navigation";
 import {useCallback, useEffect, useState} from "react"
-import {supabase} from "@/lib/supabase"
 
 export default function BrowserPage() {
   const router = useRouter();
   const [rooms, setRooms] = useState<BrowserRow[]>([]);
 
   const fetchRooms = useCallback(async(): Promise<BrowserRow[]> => {
-      const {data} = await supabase.from("rooms").select("*");
+      const res = await fetch("/api/browser", {
+        method:"GET"
+      });
+      const data = await res.json();
       return data ?? [];
   }, []);
 

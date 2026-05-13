@@ -20,8 +20,8 @@ export async function POST(req: Request) {
 }
 
 export async function GET(){
-    const {data} = await supabase.from("rooms").select("*");
-    return Response.json({data});
+    const {data} = await supabase.from("rooms").select("id, host, type, size").eq('state','Pending');
+    return Response.json(data);
 }
 
 export async function PUT(req: Request) {
