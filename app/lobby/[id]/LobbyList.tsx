@@ -15,6 +15,10 @@ export default function LobbyList({username}: {username:string}) {
   const [isHost, setHost] = useState(false);
   const channelRef = useRef<RealtimeChannel>(null);
 
+  const [time, setTime] = useState("option1");
+  const [boardSize, setBoardSize] = useState("option1");
+  const [winConditions, setWinConditions] = useState("option1");
+
   // Check if it is host's lobby
   useEffect(() => {
     const checkHost = async () => {
@@ -78,6 +82,10 @@ export default function LobbyList({username}: {username:string}) {
     };
   }, [id, username, router]);
 
+  const getSettings = (): number => {
+    return ((Number(time.at(-1))*100) + (Number(boardSize.at(-1))*10) + (Number(winConditions.at(-1))));
+  }
+
   const start_game = async () => {
     if (!isHost) return;
     const res = await fetch("/api/browser", {
@@ -86,15 +94,16 @@ export default function LobbyList({username}: {username:string}) {
       });
     const data = await res.json();
     if (!data.valid) return;
+    const settings: number = getSettings();
+    await fetch("/api/lobby", {
+      method: "PUT",
+      body: JSON.stringify({id: id, settings: settings})
+    })
     channelRef.current?.send({
       type:"broadcast",
       event:"start_game",
     });
   };
-
-  const [time, setTime] = useState("option1");
-  const [boardSize, setBoardSize] = useState("option1");
-  const [winConditions, setWinConditions] = useState("option1");
 
   return (
     <div>

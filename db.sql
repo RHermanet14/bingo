@@ -5,7 +5,7 @@ CREATE TABLE rooms (
 	type text CHECK (type IN ('Public', 'Private')),
 	password text,
 	size INT CHECK (size BETWEEN 0 AND 30),
-  state text CHECK (type IN ('Pending', 'Started', 'Finished')) default 'Pending',
+  state text CHECK (state IN ('Pending', 'Started', 'Finished')) default 'Pending',
   settings INT default 111, -- Each digit represents the option number
 	created_at timestamp default now()
 );
