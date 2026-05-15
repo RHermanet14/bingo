@@ -25,7 +25,7 @@ const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i); /
 const generatedNumbers: number[] = []; // list of numbers already called
 
 let isTimerStopped: boolean = false;
-const bingoNumberInterval: number = 3000;
+let bingoNumberInterval: number = 3000;
 //#endregion
 
 export function Board() {
@@ -266,12 +266,21 @@ export function Timer() {
     }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
 
     useEffect(() => {
+        const getSettings = async () => {
+            const res = await fetch("/api/lobby", {
+                method: "POST",
+                body: JSON.stringify({id: id})
+            });
+            const settings = await res.json();
+            bingoNumberInterval = settings;
+        }
+        getSettings();
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
         return () => {
             if (intervalRef.current)
                 clearInterval(intervalRef.current);
         };
-    }, [setBingoNumber]);
+    }, [setBingoNumber, id]);
 
     return (
         <div>
