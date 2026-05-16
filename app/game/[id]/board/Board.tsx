@@ -4,6 +4,7 @@ import {useParams, useRouter} from "next/navigation";
 import {getChannel, initChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { getuserId } from "@/lib/localVars";
+import { getTimeSetting } from "@/lib/localVars";
 
 //#region Global variables
 const boardNumbers: number[] = []; // represents user's board
@@ -25,7 +26,6 @@ const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i); /
 const generatedNumbers: number[] = []; // list of numbers already called
 
 let isTimerStopped: boolean = false;
-let bingoNumberInterval: number = 3000;
 //#endregion
 
 export function Board() {
@@ -168,6 +168,7 @@ export function Timer() {
     const [letterNum, setLetterNum] = useState("");
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const {id} = useParams();
+    const [bingoNumberInterval, setBingoNumberInterval] = useState<number>(3000);
     
     const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
         NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
@@ -190,7 +191,7 @@ export function Timer() {
         const index: number =  (payloadInfo.seed + tick * 17) % remainingBingoNumbers.length;
         const removedElement = remainingBingoNumbers.splice(index, 1);
         return removedElement[0] + 1;
-    }, [payloadInfo, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
+    }, [payloadInfo, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, bingoNumberInterval]);
 
     function convertToBingoNumber(num: number): string {
         const numString: string = num.toString();
@@ -265,22 +266,30 @@ export function Timer() {
         }
     }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
 
-    useEffect(() => {
-        const getSettings = async () => {
-            const res = await fetch("/api/lobby", {
+    const getSettings = useCallback(async(): Promise<number> => {
+        const res = await fetch("/api/lobby", {
                 method: "POST",
                 body: JSON.stringify({id: id})
-            });
-            const settings = await res.json();
-            bingoNumberInterval = settings;
+        });
+        const settings = await res.json();
+        console.log(settings.settings);
+        return settings.settings;
+    }, [id]);
+
+    useEffect(() => {
+        const setSettings = async()=> {
+            const settings: number = await getSettings();
+            const time = getTimeSetting(Math.trunc(settings / 100));
+            console.log(time, settings, Math.trunc(settings/100));
+            setBingoNumberInterval(time);
         }
-        getSettings();
+        setSettings();
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
         return () => {
             if (intervalRef.current)
                 clearInterval(intervalRef.current);
         };
-    }, [setBingoNumber, id]);
+    }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
 
     return (
         <div>

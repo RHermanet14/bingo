@@ -13,6 +13,6 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     const {id} = await req.json();
-    const {data} = await supabase.from("rooms").select("settings").eq("id", id);
+    const {data} = await supabase.from("rooms").select("settings").eq("id", id).single();
     return Response.json(data);
 }
