@@ -37,6 +37,7 @@ export function Board() {
     );
     const [username, setUsername] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
+    const {id} = useParams();
     
     function generateBoardNumber(letter: number): number {
         return Math.floor(Math.random() * 15) + (letter * 15) + 1;
@@ -103,6 +104,15 @@ export function Board() {
 
     const channelRef = useRef<RealtimeChannel>(null);
     
+    const getSettings = useCallback(async(): Promise<number> => {
+        const res = await fetch("/api/lobby", {
+                method: "POST",
+                body: JSON.stringify({id: id})
+        });
+        const settings = await res.json();
+        return settings.settings;
+    }, [id]);
+
     useEffect(() => {
         const getUsername = async() => {
             const usernameRes = await fetch("/api/username", {
@@ -112,7 +122,12 @@ export function Board() {
             setUsername(usernameData.username);
         }
         getUsername();
-    }, []);
+        const setSettings = async()=> {
+            const settings: number = await getSettings();
+            console.log(Math.trunc(settings/10) % 10, settings % 10); // board size and win conditions
+        }
+        setSettings();
+    }, [getSettings]);
 
     useEffect(() => {
         const userId = getuserId();
@@ -272,7 +287,6 @@ export function Timer() {
                 body: JSON.stringify({id: id})
         });
         const settings = await res.json();
-        console.log(settings.settings);
         return settings.settings;
     }, [id]);
 
@@ -280,7 +294,6 @@ export function Timer() {
         const setSettings = async()=> {
             const settings: number = await getSettings();
             const time = getTimeSetting(Math.trunc(settings / 100));
-            console.log(time, settings, Math.trunc(settings/100));
             setBingoNumberInterval(time);
         }
         setSettings();
