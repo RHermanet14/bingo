@@ -20,6 +20,27 @@ export function getTimeSetting(option: number): number {
     }
 }
 
+export function setBoard(board: number[]) {
+    let localBoard: string = "";
+    board.forEach(space => {
+        localBoard += space.toString() + ' ';
+    });
+    console.log(localBoard);
+    localStorage.setItem("board", localBoard);
+}
+
+export function getBoard() {
+    let board = localStorage.getItem("board");
+    if (!board) {
+        board = "";
+        for (let i: number = 1; i < 26; i++) {
+            board += i.toString() + ' ';
+        }
+    }
+    console.log(board);
+    return board;
+}
+
 export function getBoardSetting(option: number): number {
  return option;
 }
