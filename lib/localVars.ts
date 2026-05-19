@@ -20,6 +20,20 @@ export function getTimeSetting(option: number): number {
     }
 }
 
+function generateBoardNumber(letter: number): number {
+        return Math.floor(Math.random() * 15) + (letter * 15) + 1;
+    };
+
+export function buildBoard(): number[] {
+    const boardNumbers: number[] = [];
+    for (let i: number = 0; i < 25; i++) {
+        let space: number = generateBoardNumber(i%5);
+        while(boardNumbers.includes(space)) {space = generateBoardNumber(i%5);}
+        boardNumbers.push(space);
+    }
+    return boardNumbers;
+}
+
 export function setBoard(board: number[]) {
     let localBoard: string = "";
     board.forEach(space => {
@@ -29,16 +43,19 @@ export function setBoard(board: number[]) {
     localStorage.setItem("board", localBoard);
 }
 
-export function getBoard() {
+export function getBoard(): number [] {
     let board = localStorage.getItem("board");
+    let numBoard: number[];
     if (!board) {
         board = "";
-        for (let i: number = 1; i < 26; i++) {
-            board += i.toString() + ' ';
-        }
+        numBoard = buildBoard();
+        setBoard(numBoard);
+        console.log(numBoard);
+        return numBoard;
     }
-    console.log(board);
-    return board;
+    numBoard = board.split(' ').map(Number);
+    console.log(numBoard);
+    return numBoard;
 }
 
 export function getBoardSetting(option: number): number {
