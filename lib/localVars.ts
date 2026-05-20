@@ -35,10 +35,7 @@ export function buildBoard(): number[] {
 }
 
 export function setBoard(board: number[]) {
-    let localBoard: string = "";
-    board.forEach(space => {
-        localBoard += space.toString() + ' ';
-    });
+    const localBoard: string = board.join(' ');
     console.log(localBoard);
     localStorage.setItem("board", localBoard);
 }

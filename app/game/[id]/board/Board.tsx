@@ -3,11 +3,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams, useRouter} from "next/navigation";
 import {getChannel, initChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { getuserId } from "@/lib/localVars";
+import { getBoard, getuserId } from "@/lib/localVars";
 import { getTimeSetting } from "@/lib/localVars";
 
 //#region Global variables
-const boardNumbers: number[] = []; // represents user's board
+let boardNumbers: number[] = []; // represents user's board
 const winConditions: number[][] = [ // list of win conditions
     [0,1,2,3,4], // rows
     [5,6,7,8,9],
@@ -38,21 +38,6 @@ export function Board() {
     const [username, setUsername] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
     const {id} = useParams();
-    
-    function generateBoardNumber(letter: number): number {
-        return Math.floor(Math.random() * 15) + (letter * 15) + 1;
-    };
-
-    function buildBoard(index: number): number {
-        let space: number = generateBoardNumber(index%5);
-        while(boardNumbers.includes(space)) {space = generateBoardNumber(index%5);}
-        boardNumbers.push(space);
-        return space;
-    }
-
-    const [bingoNumbers] = useState<number[]>(
-        () => Array.from({length: 25}, (_, i) => buildBoard(i))
-    );
 
     const placeChip = (index: number) => {
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
@@ -114,6 +99,7 @@ export function Board() {
     }, [id]);
 
     useEffect(() => {
+        boardNumbers = getBoard();
         const getUsername = async() => {
             const usernameRes = await fetch("/api/username", {
                 method: "GET"
@@ -152,7 +138,7 @@ export function Board() {
                 <p>N</p>
                 <p>G</p>
                 <p>O</p>
-                {bingoNumbers.map((num,i) => (
+                {boardNumbers.map((num,i) => (
                     <button key={i} onClick={() => placeChip(i)}
                         className={active[i] ? "bg-yellow-300 opacity-75" : "bg-gray-400"}
                     >
