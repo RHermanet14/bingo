@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Grid from "./grid/Grid"
 import { LobbyRow} from "./grid/types";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { buildBoard, getuserId, setBoard } from "@/lib/localVars";
+import { buildBoard, getBoard, getuserId, setBoard } from "@/lib/localVars";
 import { initChannel, removeChannel } from "@/lib/channelManager";
 
 export default function LobbyList({username}: {username:string}) {
@@ -104,6 +104,20 @@ export default function LobbyList({username}: {username:string}) {
       event:"start_game",
     });
   };
+
+  const [boardVisible, setBoardVisible] = useState<boolean>(false);
+  const [boardNumbers, setBoardNumbers] = useState<number[]>([]);
+  useEffect(() => {
+    const initBoard = async() => {
+      setBoardNumbers(getBoard);
+    }
+    initBoard();
+  },[]);
+
+  const changeBoard = () => {
+    setBoard(buildBoard())
+    setBoardNumbers(getBoard);
+  }
 
   return (
     <div>
@@ -256,7 +270,25 @@ export default function LobbyList({username}: {username:string}) {
           </div>
           : null
         }
-        <button className="bg-amber-500" onClick={() => setBoard(buildBoard())}>Change Board</button>
+        <button className="bg-amber-500" onClick={() => setBoardVisible(!boardVisible)}>View Board</button>
+        {
+          boardVisible ?
+          <div>
+            <button className="bg-amber-500" onClick={() => changeBoard()}>Change Board</button>
+            <div className="grid grid-cols-5 gap-5 text-center text-3xl border-2 p-4 bg-gray-400">
+                <p>B</p>
+                <p>I</p>
+                <p>N</p>
+                <p>G</p>
+                <p>O</p>
+                {boardNumbers.map((num,i) => (
+                    <p key={i}> {i === 12 ? "Free Space" : num} </p>
+                ))}
+            </div>
+          </div>
+          : null
+        }
+        
         
         <div className="min-h-screen flex flex-col items-center justify-center">
         <p>Users in this lobby:</p>
