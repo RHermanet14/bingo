@@ -120,8 +120,8 @@ export default function LobbyList({username}: {username:string}) {
   }
 
   return (
-    <div>
-      <div className="bg-gray-200">
+    <div className="bg-gray-200 min-h-screen">
+      <div>
         <div className="p-2 flex gap-4 text-lg bg-gray-400">
           <button onClick={() => router.replace("/browser")} className="bg-blue-400">Back To Browser</button>
           <p className="ml-auto">{users.length}/30</p>
@@ -133,7 +133,7 @@ export default function LobbyList({username}: {username:string}) {
         </div>
         {
           isHost ?
-          <div>
+          <div className="flex gap-10 bg-gray-300">
             <h1 className="font-bold text-3xl bg-gray-300 justify-center items-center flex">Settings:</h1>
             <div className="flex flex-col">
               <h1>Time:</h1>
@@ -270,11 +270,15 @@ export default function LobbyList({username}: {username:string}) {
           </div>
           : null
         }
-        <button className="bg-amber-500" onClick={() => setBoardVisible(!boardVisible)}>View Board</button>
+        <div className="flex justify-center items-center">
+          <button className="bg-amber-500 text-3xl p-4 m-5" onClick={() => setBoardVisible(!boardVisible)}>View Board</button>
+        </div>
         {
           boardVisible ?
           <div>
-            <button className="bg-amber-500" onClick={() => changeBoard()}>Change Board</button>
+            <div className="flex justify-center items-center">
+              <button className="bg-blue-500 text-3xl p-4 m-5" onClick={() => changeBoard()}>Change Board</button>
+            </div>
             <div className="grid grid-cols-5 gap-5 text-center text-3xl border-2 p-4 bg-gray-400">
                 <p>B</p>
                 <p>I</p>
@@ -290,9 +294,9 @@ export default function LobbyList({username}: {username:string}) {
         }
         
         
-        <div className="min-h-screen flex flex-col items-center justify-center">
-        <p>Users in this lobby:</p>
-        <Grid items={users} username={username} isHost={isHost}/>
+        <div className="flex flex-col items-center justify-center text-3xl">
+          <p className="font-bold mt-5">Users in this lobby:</p>
+          <Grid items={users} username={username} isHost={isHost}/>
         </div>
       </div>
     </div>
