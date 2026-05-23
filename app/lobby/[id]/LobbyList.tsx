@@ -180,50 +180,6 @@ export default function LobbyList({username}: {username:string}) {
             </div>
 
             <div className="flex flex-col">
-              <h1>Board Size:</h1>
-              <label>
-                <input
-                  type="radio"
-                  name="boardChoice"
-                  value="option1"
-                  checked={boardSize === "option1"}
-                  onChange={(e) => setBoardSize(e.target.value)}
-                />
-                5 x 5
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="boardChoice"
-                  value="option2"
-                  checked={boardSize === "option2"}
-                  onChange={(e) => setBoardSize(e.target.value)}
-                />
-                3 x 3
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="boardChoice"
-                  value="option3"
-                  checked={boardSize === "option3"}
-                  onChange={(e) => setBoardSize(e.target.value)}
-                />
-                7 x 7
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="boardChoice"
-                  value="option4"
-                  checked={boardSize === "option4"}
-                  onChange={(e) => setBoardSize(e.target.value)}
-                />
-                9 x 9
-              </label>
-            </div>
-
-            <div className="flex flex-col">
               <h1>Win Conditions:</h1>
               <label>
                 <input
@@ -264,6 +220,50 @@ export default function LobbyList({username}: {username:string}) {
                   onChange={(e) => setWinConditions(e.target.value)}
                 />
                 Blackout
+              </label>
+            </div>
+
+            <div className="flex flex-col">
+              <h1>Special Mode:</h1>
+              <label>
+                <input
+                  type="radio"
+                  name="boardChoice"
+                  value="option1"
+                  checked={boardSize === "option1"}
+                  onChange={(e) => setBoardSize(e.target.value)}
+                />
+                Unselect
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="boardChoice"
+                  value="option2"
+                  checked={boardSize === "option2"}
+                  onChange={(e) => setBoardSize(e.target.value)}
+                />
+                Board Swap
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="boardChoice"
+                  value="option3"
+                  checked={boardSize === "option3"}
+                  onChange={(e) => setBoardSize(e.target.value)}
+                />
+                Powers
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="boardChoice"
+                  value="option4"
+                  checked={boardSize === "option4"}
+                  onChange={(e) => setBoardSize(e.target.value)}
+                />
+                Random
               </label>
             </div>
 

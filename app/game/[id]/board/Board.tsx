@@ -110,7 +110,7 @@ export function Board() {
         getUsername();
         const setSettings = async()=> {
             const settings: number = await getSettings();
-            console.log(Math.trunc(settings/10) % 10, settings % 10); // board size and win conditions
+            console.log(Math.trunc(settings/10) % 10, settings % 10); //win conditions and extra modes
         }
         setSettings();
     }, [getSettings]);
