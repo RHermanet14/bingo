@@ -22,6 +22,7 @@ const winConditions: number[][] = [ // list of win conditions
     [0,6,12,18,24], // Diagonals
     [20,16,12,8,4],
 ];
+const cornerConditions: number[] = [0,4,20,24];
 const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i); // numbers to be called by timer
 const generatedNumbers: number[] = []; // list of numbers already called
 
@@ -55,6 +56,34 @@ export function Board() {
     const callBingo = (): boolean => {
         let index: number = 0;
         let isBingo: boolean = true;
+        let numLines: number = 0;
+        let linesNeeded: number = 1;
+        switch(winSettings) {
+            case 2: // two lines
+                linesNeeded = 2;
+                break;
+            case 3: // four corners
+                cornerConditions.forEach(space => {
+                    if (!active[space] || !validNum(space))
+                        isBingo = false
+                });
+                if (isBingo) {
+                    setOutcome(Outcome.Won);
+                    channelRef.current?.send({
+                        type:"broadcast",
+                        event:"winGame",
+                        payload: {message: username}
+                    });
+                    return true;
+                }
+                setOutcome(Outcome.Lost);
+                return false;
+            case 4: // blackout
+                linesNeeded = 12;
+                break;
+            default: // single line
+                break;
+        }
         while (winConditions.at(index) !== undefined) {
             winConditions[index].forEach(space => {
                 if (!active[space] || !validNum(space))
