@@ -233,7 +233,7 @@ export default function LobbyList({username}: {username:string}) {
                   checked={boardSize === "option1"}
                   onChange={(e) => setBoardSize(e.target.value)}
                 />
-                Unselect
+                Default
               </label>
               <label>
                 <input
@@ -243,7 +243,7 @@ export default function LobbyList({username}: {username:string}) {
                   checked={boardSize === "option2"}
                   onChange={(e) => setBoardSize(e.target.value)}
                 />
-                Board Swap
+                Unselect
               </label>
               <label>
                 <input
@@ -253,7 +253,7 @@ export default function LobbyList({username}: {username:string}) {
                   checked={boardSize === "option3"}
                   onChange={(e) => setBoardSize(e.target.value)}
                 />
-                Powers
+                Board Swap
               </label>
               <label>
                 <input
@@ -263,7 +263,7 @@ export default function LobbyList({username}: {username:string}) {
                   checked={boardSize === "option4"}
                   onChange={(e) => setBoardSize(e.target.value)}
                 />
-                Random
+                Powers
               </label>
             </div>
 

@@ -39,6 +39,9 @@ export function Board() {
     const [winner, setWinner] = useState<string>("");
     const {id} = useParams();
 
+    const [winSettings, setWinSettings] = useState<number>(1);
+    const [mode, setMode] = useState<number>(1);
+
     const placeChip = (index: number) => {
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
     };
@@ -110,6 +113,8 @@ export function Board() {
         getUsername();
         const setSettings = async()=> {
             const settings: number = await getSettings();
+            setWinSettings(Math.trunc(settings / 10) % 10);
+            setMode(settings % 10);
             console.log(Math.trunc(settings/10) % 10, settings % 10); //win conditions and extra modes
         }
         setSettings();
@@ -283,6 +288,7 @@ export function Timer() {
             setBingoNumberInterval(time);
         }
         setSettings();
+        console.log(bingoNumberInterval);
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
         return () => {
             if (intervalRef.current)
