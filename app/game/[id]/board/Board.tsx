@@ -90,6 +90,9 @@ export function Board() {
                     isBingo = false;
             });
             if (isBingo) {
+                numLines++;
+            }
+            if (linesNeeded === numLines) {
                 setOutcome(Outcome.Won);
                 channelRef.current?.send({
                     type:"broadcast",
