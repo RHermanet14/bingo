@@ -21,9 +21,9 @@ export default function BrowserPage() {
   }, [fetchRooms]);
 
   const searchRooms = () => {
-    
-  }
 
+  }
+  
   return (
     <div>
       <h1 className="text-2xl text-center p-1 bg-gray-400">Browse Lobbies</h1>
