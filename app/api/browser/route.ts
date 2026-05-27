@@ -1,5 +1,6 @@
 import {supabase} from "@/lib/supabase";
 import {cookies} from "next/headers";
+import { NextRequest } from "next/server";
 
 export async function POST(req: Request) {
     const {password} = await req.json();
@@ -19,9 +20,16 @@ export async function POST(req: Request) {
     return Response.json({id});
 }
 
-export async function GET(){
-    const {data} = await supabase.from("rooms").select("id, host, type, size").eq('state','Pending');
-    return Response.json(data);
+export async function GET(req: NextRequest){
+    const params = req.nextUrl.searchParams
+    const name = params.get('name');
+    if (!name) {
+        const {data} = await supabase.from("rooms").select("id, host, type, size").eq('state','Pending');
+        return Response.json(data);
+    } else {
+        const {data} = await supabase.from("rooms").select("id, host, type, size").eq('state','Pending').eq('host', name);
+        return Response.json(data);
+    }
 }
 
 export async function PUT(req: Request) {
