@@ -62,3 +62,11 @@ export function getBoardSetting(option: number): number {
 export function getWinSetting(option: number): number {
     return option;
 }
+
+export function loadVar(varName: string): string {
+    return localStorage.getItem(varName) ?? "Error, variable not found";
+}
+
+export function saveVar(varName:string, varValue: string) {
+    localStorage.set(varName, varValue);
+}

@@ -1,32 +1,30 @@
+"use client"
 import { useEffect, useState } from "react"
-import {cookies} from 'next/headers'
+import { loadVar, saveVar } from "@/lib/localVars";
+import { useRouter } from "next/navigation";
 
 export default function Settings() {
+    const router = useRouter()
     const [theme, setTheme] = useState<boolean>(false)
     const [username, setUsername] = useState<string>("");
     useEffect(() => {
         const loadCookies = async() => {
-            const cookieStore = await cookies();
-            const cookieTheme = cookieStore.get('theme')?.value;
-            console.log('Converting string to boolean? =', Boolean(cookieTheme));
-            setTheme(Boolean(cookieTheme));
-            const cookieName = cookieStore.get('username')?.value;
-            setUsername(cookieName ?? "");
+            setTheme(Boolean(loadVar('theme')));
+            setUsername(loadVar('username'));
         }
         loadCookies();
-    })
+    }, [])
     const saveChanges = async() => {
-        const cookieStore = await cookies();
-        cookieStore.set('username', username);
-        cookieStore.set('theme', theme.toString());
+        saveVar('username', username);
+        saveVar('theme', theme.toString());
     }
     return (
         <div>
-            <button>Back to Browser</button>
-            <div className="flex items-center">
-                <p>Theme</p>
-                <button onClick={() => setTheme(theme)}>{theme ? "Light" : "Dark"}</button>
-                <p>Change Username</p>
+            <button className="bg-blue-500 rounded p-3 text-2xl" onClick={() => router.replace("/browser")}>Back to Browser</button>
+            <div className="flex flex-col items-center gap-5 px-4 py-1 text-3xl">
+                <p className="bg-orange-500 px-4 py-1">Theme</p>
+                <button className="bg-gray-800 text-amber-50 rounded px-4 py-1" onClick={() => setTheme(!theme)}>{theme ? "Light" : "Dark"}</button>
+                <p className="bg-orange-500 px-4 py-1">Change Username</p>
                 <input
                     name="name"
                     placeholder="friendly_user123"
