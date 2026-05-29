@@ -53,8 +53,6 @@ export default function BrowserPage() {
           <button onClick={() => router.push("/lobby")}
         className="bg-gray-500 rounded">Create Lobby</button>
         </div>
-        
-        
       </div>
       <Grid items={rooms}/>
     </div>

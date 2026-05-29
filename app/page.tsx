@@ -24,12 +24,12 @@ export default function Page() {
         onChange={(e) => setUsername(e.target.value)}
         className="border border-gray-400 rounded px-3 py-1"
       />
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-600 text-white rounded px-4 py-1 hover:bg-blue-700"
-        >
-          Submit
-        </button>
+      <button
+        onClick={handleSubmit}
+        className="bg-blue-600 text-white rounded px-4 py-1 hover:bg-blue-700"
+      >
+        Submit
+      </button>
     </div>
   )
 }
