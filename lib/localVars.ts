@@ -68,5 +68,5 @@ export function loadVar(varName: string): string {
 }
 
 export function saveVar(varName:string, varValue: string) {
-    localStorage.set(varName, varValue);
+    localStorage.setItem(varName, varValue);
 }
