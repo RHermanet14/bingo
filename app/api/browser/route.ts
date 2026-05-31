@@ -1,10 +1,8 @@
 import {supabase} from "@/lib/supabase";
-import {cookies} from "next/headers";
 import { NextRequest } from "next/server";
 
 export async function POST(req: Request) {
-    const {password} = await req.json();
-    const username = (await (cookies())).get("username")?.value || "unknown";
+    const {username, password} = await req.json();
     const id = crypto.randomUUID();
 
     if (password === null || password.trim().length === 0) {

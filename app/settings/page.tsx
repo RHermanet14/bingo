@@ -17,11 +17,7 @@ export default function Settings() {
     const saveChanges = async() => {
         saveVar('username', username);
         saveVar('theme', theme.toString());
-    }
-
-    const changeTheme = (theme: string) => {
-        setTheme(theme);
-
+        window.alert('Changes successfully saved.');
     }
 
     return (
@@ -31,8 +27,8 @@ export default function Settings() {
                 
                 <div className="flex">
                     <p className="bg-orange-500 text-white px-4 py-1 rounded mr-5">Theme</p>
-                    <button className="border-2 boarder-amber-500 bg-gray-400 text-amber-50 rounded px-4 py-1" onClick={() => changeTheme('Dark')}>Dark</button>
-                    <button className="border-2 border-black bg-amber-50 text-black rounded px-4 py-1" onClick={() => changeTheme('Light')}>Light</button>
+                    <button className="border-2 boarder-amber-500 bg-gray-400 text-amber-50 rounded px-4 py-1" onClick={() => setTheme('Dark')}>Dark</button>
+                    <button className="border-2 border-black bg-amber-50 text-black rounded px-4 py-1" onClick={() => setTheme('Light')}>Light</button>
                 </div>
                 <div className="flex">
                     <p className="bg-orange-500 text-white px-4 py-1 rounded mr-5">Change Username</p>

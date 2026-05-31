@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import {useState} from "react"
 
 export default function LobbyPage() {
+    const username = localStorage.getItem('username') ?? "unknown";
     const router = useRouter();
     const [password, setPassword] = useState("");
 
     const createRoom = async () => {
         const res = await fetch("/api/browser", {
             method: "POST",
-            body: JSON.stringify({password: password}),
+            body: JSON.stringify({username:username, password: password}),
         });
         const data = await res.json();
         router.replace(`/lobby/${data.id}`);

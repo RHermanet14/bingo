@@ -10,7 +10,7 @@ export default function Page() {
       alert("Invalid username");
       return
     }
-    document.cookie =`username=${username}; path=/; max-age=86400`; // 1 day
+    localStorage.setItem('username', username);
     router.push("/browser");
   };
 

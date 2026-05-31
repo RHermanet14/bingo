@@ -8,7 +8,8 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 import { buildBoard, getBoard, getuserId, setBoard } from "@/lib/localVars";
 import { initChannel, removeChannel } from "@/lib/channelManager";
 
-export default function LobbyList({username}: {username:string}) {
+export default function LobbyList() {
+  const username = localStorage.getItem('username') ?? "unknown";
   const router = useRouter();
   const { id } = useParams(); // lobby id from URL
   const [users, setUsers] = useState<LobbyRow[]>([]);
