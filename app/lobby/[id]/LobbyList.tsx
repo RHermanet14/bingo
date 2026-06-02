@@ -77,6 +77,13 @@ export default function LobbyList() {
           method: "PUT",
           body: JSON.stringify({id: id, amount: -1})   
         });
+        const {data} = await res.json();
+        if(data === 0) { // delete lobby if empty
+          await fetch("api/lobby", {
+            method: "DELETE",
+            body: JSON.stringify({id: id})
+          });
+        }
        console.log("decrease size count: ", res);
       }
       decreaseSize();

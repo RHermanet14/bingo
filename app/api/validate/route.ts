@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
     const {id, amount} = await req.json();
-    const {error} = await supabase
+    const {data} = await supabase
         .rpc('increment', {row_id: id, amount: amount});
-    return Response.json({error});
+    return Response.json({data});
 }

@@ -33,9 +33,15 @@ drop policy if exists "rooms anon delete" on rooms;
 create policy "rooms anon delete" on rooms
   for delete to anon using (true);
 
-create function increment(row_id uuid, amount int)
-returns void as $$
-  update rooms
-  set size = size + amount
-  where id = row_id
-$$ language sql;
+CREATE OR REPLACE FUNCTION increment(row_id uuid, amount int)
+RETURNS int
+LANGUAGE plpgsql AS $$
+DECLARE result int;
+BEGIN
+  UPDATE rooms
+  SET size = size + amount
+  WHERE id = row_id
+  RETURNING size INTO result;
+  RETURN result;
+END;
+$$;
