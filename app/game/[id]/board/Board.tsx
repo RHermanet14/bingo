@@ -53,7 +53,7 @@ export function Board() {
         return generatedNumbers.includes(boardNumbers[space]);
     }
 
-    const callBingo = (): boolean => {
+    const callBingo = async(): Promise<boolean> => {
         let index: number = 0;
         let isBingo: boolean = true;
         let numLines: number = 0;
@@ -73,6 +73,10 @@ export function Board() {
                         type:"broadcast",
                         event:"winGame",
                         payload: {message: username}
+                    });
+                    await fetch("/apli/game", {
+                        method: "PUT",
+                        body: JSON.stringify({id: id})
                     });
                     return true;
                 }
@@ -99,6 +103,11 @@ export function Board() {
                     event:"winGame",
                     payload: {message: username}
                 });
+                await fetch("/apli/game", {
+                    method: "PUT",
+                    body: JSON.stringify({id: id})
+                });
+                
                 return true;
             }
             isBingo = true;
