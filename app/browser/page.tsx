@@ -1,4 +1,5 @@
 "use client";
+import { loadVar } from "@/lib/localVars";
 import Grid from "./grid/Grid";
 import {BrowserRow} from "./grid/types"
 import { useRouter } from "next/navigation";
@@ -8,6 +9,7 @@ export default function BrowserPage() {
   const router = useRouter();
   const [rooms, setRooms] = useState<BrowserRow[]>([]);
   const [search, setSearch] = useState<string>("");
+  const [theme, setTheme] = useState<string>("Light");
 
   const fetchRooms = useCallback(async(): Promise<BrowserRow[]> => {
       const res = await fetch("/api/browser", {
@@ -16,6 +18,13 @@ export default function BrowserPage() {
       const data = await res.json();
       return data ?? [];
   }, []);
+
+useEffect(() => {
+        const loadCookies = async() => {
+            setTheme(loadVar('theme'));
+        }
+        loadCookies();
+    }, [])
 
   useEffect(() => {
     fetchRooms().then(setRooms);
@@ -33,7 +42,7 @@ export default function BrowserPage() {
   }
   
   return (
-    <div>
+    <div className={`min-h-screen ${theme === "Light" ? "bg-white" : "bg-gray-700"}`}>
       <h1 className="text-2xl text-center p-1 bg-gray-400">Browse Lobbies</h1>
       <div className="flex bg-gray-400 p-1 gap-2">
         <button onClick={() => searchRooms()}className="bg-orange-400 rounded">Search</button>
@@ -41,7 +50,7 @@ export default function BrowserPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search Host Name"
-          className="bg-white"
+          className={`${theme === "Light" ? "bg-white text-black" : "bg-gray-500 text-amber-50"}`}
         />
         <button className="bg-gray-500 rounded" onClick={async() => {
           const newRooms: BrowserRow[] = await fetchRooms();

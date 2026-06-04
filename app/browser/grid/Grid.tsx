@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import {BrowserRow} from "./types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { loadVar } from "@/lib/localVars";
 
 interface GridProps {
     items: BrowserRow[];
@@ -16,6 +17,7 @@ export default function Grid({items}: GridProps) {
     const [needPassword, setNeedPassword] = useState<number>();
     const [password, setPassword] = useState("");
     const [invalid, setInvalid] = useState(false);
+    const [theme, setTheme] = useState<string>("Light")
 
     const onJoinButtonClick = (item: BrowserRow) => {
         const check: boolean = checkNeedPassword(item.type);
@@ -25,6 +27,13 @@ export default function Grid({items}: GridProps) {
             setNeedPassword(item.id);
         }
     }
+
+    useEffect(() => {
+            const loadCookies = async() => {
+                setTheme(loadVar('theme'));
+            }
+            loadCookies();
+    }, [])
 
     const checkPassword = async() => {
         const res = await fetch("api/validate", {
@@ -62,7 +71,7 @@ export default function Grid({items}: GridProps) {
     return (
         <div className="grid grid-cols-1 border-t border-gray-300">
             {items.map((item) => (
-                <div key={item.id} className="flex items-center p-4 bg-gray-100 justify-start gap-2 border-b border-gray-300">
+                <div key={item.id} className={`flex items-center p-4 justify-start gap-2 border-b border-gray-300 ${theme === "Light" ? "bg-gray-100" : "bg-gray-500"}`}>
                     <p className="grow font-semibold truncate text-center">
                         {item.host}
                     </p>
