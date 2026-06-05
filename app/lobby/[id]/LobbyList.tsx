@@ -310,7 +310,7 @@ export default function LobbyList() {
         
         <div className="flex flex-col items-center justify-center text-3xl">
           <p className="font-bold mt-5">Users in this lobby:</p>
-          <Grid items={users} username={username} isHost={isHost}/>
+          <Grid items={users} isHost={isHost}/>
         </div>
       </div>
     </div>

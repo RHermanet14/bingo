@@ -3,14 +3,15 @@ import { useEffect, useRef } from "react";
 import { LobbyRow } from "./types";
 import { getChannel } from "@/lib/channelManager";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { getuserId } from "@/lib/localVars";
 
 interface GridProps {
     items: LobbyRow[];
-    username?: string;
     isHost: boolean;
 }
 
-export default function Grid({items, username, isHost}: GridProps) {
+export default function Grid({items, isHost}: GridProps) {
+    const userId = getuserId();
     const channelRef = useRef<RealtimeChannel>(null);
     useEffect(() => {
         const channel = getChannel();
@@ -33,10 +34,10 @@ export default function Grid({items, username, isHost}: GridProps) {
                 <div key={i} className="flex items-center p-4 bg-gray-100 justify-start gap-2 border-b border-gray-300">
                     <p className="grow font-semibold truncate text-center">
                         {item.username}
-                        {item.username === username ? " (you)" : ""}
+                        {item.userId === userId ? " (you)" : ""}
                     </p>
                     {
-                        isHost && item.username !== username ?
+                        isHost && item.userId !== userId ?
                         <button
                             onClick={() => kick_player(item.userId)}
                             className="bg-blue-400 rounded text-lg px-4 font-semibold">
