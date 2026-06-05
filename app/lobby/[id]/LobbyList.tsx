@@ -19,19 +19,7 @@ export default function LobbyList() {
   const [time, setTime] = useState("option1");
   const [boardSize, setBoardSize] = useState("option1");
   const [winConditions, setWinConditions] = useState("option1");
-
-  // Check if it is host's lobby
-  useEffect(() => {
-    const checkHost = async () => {
-      const res = await fetch("/api/browser", {
-        method: "PUT",
-        body: JSON.stringify({id: id, host: username}),
-      });
-      const data = await res.json();
-      setHost(data.valid);
-    }
-    checkHost();
-  },[id, username])
+  const alreadyCheckedHost = useRef(false);
 
   useEffect(() => {
     if (!id) return;
@@ -89,6 +77,24 @@ export default function LobbyList() {
       decreaseSize();
     };
   }, [id, username, router]);
+  
+  // Check if it is host's lobby
+  useEffect(() => {
+    if (users.length === 0) return;
+    if (alreadyCheckedHost.current) return;
+    const userId = getuserId();
+    alreadyCheckedHost.current = true;
+    const checkHost = async () => {
+      const res = await fetch("/api/browser", {
+        method: "PUT",
+        body: JSON.stringify({id: id, host: username}),
+      });
+      const data = await res.json();
+      setHost(data.valid && users.length === 1 && users[0].userId === userId);
+    }
+    checkHost();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[users])
 
   const getSettings = (): number => {
     return ((Number(time.at(-1))*100) + (Number(boardSize.at(-1))*10) + (Number(winConditions.at(-1))));

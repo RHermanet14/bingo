@@ -19,7 +19,7 @@ export default function BrowserPage() {
       return data ?? [];
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
         const loadCookies = async() => {
             setTheme(loadVar('theme'));
         }
