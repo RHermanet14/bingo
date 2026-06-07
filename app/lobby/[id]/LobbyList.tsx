@@ -17,8 +17,8 @@ export default function LobbyList() {
   const channelRef = useRef<RealtimeChannel>(null);
 
   const [time, setTime] = useState("option1");
-  const [boardSize, setBoardSize] = useState("option1");
   const [winConditions, setWinConditions] = useState("option1");
+  const [mode, setMode] = useState("option1");
   const alreadyCheckedHost = useRef(false);
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function LobbyList() {
   },[users])
 
   const getSettings = (): number => {
-    return ((Number(time.at(-1))*100) + (Number(boardSize.at(-1))*10) + (Number(winConditions.at(-1))));
+    return ((Number(time.at(-1))*100) + (Number(winConditions.at(-1))*10) + (Number(mode.at(-1))));
   }
 
   const start_game = async () => {
@@ -244,8 +244,8 @@ export default function LobbyList() {
                   type="radio"
                   name="boardChoice"
                   value="option1"
-                  checked={boardSize === "option1"}
-                  onChange={(e) => setBoardSize(e.target.value)}
+                  checked={mode === "option1"}
+                  onChange={(e) => setMode(e.target.value)}
                 />
                 Default
               </label>
@@ -254,8 +254,8 @@ export default function LobbyList() {
                   type="radio"
                   name="boardChoice"
                   value="option2"
-                  checked={boardSize === "option2"}
-                  onChange={(e) => setBoardSize(e.target.value)}
+                  checked={mode === "option2"}
+                  onChange={(e) => setMode(e.target.value)}
                 />
                 Unselect
               </label>
@@ -264,8 +264,8 @@ export default function LobbyList() {
                   type="radio"
                   name="boardChoice"
                   value="option3"
-                  checked={boardSize === "option3"}
-                  onChange={(e) => setBoardSize(e.target.value)}
+                  checked={mode === "option3"}
+                  onChange={(e) => setMode(e.target.value)}
                 />
                 Board Swap
               </label>
@@ -274,8 +274,8 @@ export default function LobbyList() {
                   type="radio"
                   name="boardChoice"
                   value="option4"
-                  checked={boardSize === "option4"}
-                  onChange={(e) => setBoardSize(e.target.value)}
+                  checked={mode === "option4"}
+                  onChange={(e) => setMode(e.target.value)}
                 />
                 Powers
               </label>
@@ -306,8 +306,6 @@ export default function LobbyList() {
           </div>
           : null
         }
-        
-        
         <div className="flex flex-col items-center justify-center text-3xl">
           <p className="font-bold mt-5">Users in this lobby:</p>
           <Grid items={users} isHost={isHost}/>

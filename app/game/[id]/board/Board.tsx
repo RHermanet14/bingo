@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {useParams, useRouter} from "next/navigation";
 import {getChannel, initChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { getBoard, getuserId } from "@/lib/localVars";
+import { buildBoard, getBoard, getuserId } from "@/lib/localVars";
 import { getTimeSetting } from "@/lib/localVars";
 
 //#region Global variables
@@ -156,6 +156,7 @@ export function Board() {
             const settings: number = await getSettings();
             setWinSettings(Math.trunc(settings / 10) % 10);
             setMode(settings % 10);
+            console.log(settings);
             console.log(Math.trunc(settings/10) % 10, settings % 10); //win conditions and extra modes
         }
         setSettings();
@@ -193,7 +194,18 @@ export function Board() {
                 ))}
             </div>
             <button className="bg-yellow-300 mt-1 rounded text-4xl font-bold" onClick={callBingo}>Call Bingo</button>
-
+            { // you get three board swaps per game or somethin
+                mode === 3 ? 
+                <div>
+                    <button
+                        onClick={() => boardNumbers = buildBoard()}
+                        className=""
+                    >
+                        Change Board
+                    </button>
+                </div>
+                : mode
+            }
             {
                 outcome === Outcome.None ? null :
                 <div className="flex items-center justify-center text-4xl mt-20">
