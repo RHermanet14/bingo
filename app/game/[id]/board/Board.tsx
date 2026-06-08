@@ -7,7 +7,6 @@ import { buildBoard, getBoard, getuserId } from "@/lib/localVars";
 import { getTimeSetting } from "@/lib/localVars";
 
 //#region Global variables
-let boardNumbers: number[] = []; // represents user's board
 const winConditions: number[][] = [ // list of win conditions
     [0,1,2,3,4], // rows
     [5,6,7,8,9],
@@ -42,6 +41,7 @@ export function Board() {
 
     const [winSettings, setWinSettings] = useState<number>(1);
     const [mode, setMode] = useState<number>(1);
+    const [boardNumbers,setBoardNumbers] = useState<number[]>([]); // represents user's board
 
     const placeChip = (index: number) => {
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
@@ -143,8 +143,12 @@ export function Board() {
     }, [id]);
 
     useEffect(() => {
-        boardNumbers = getBoard();
+        const getUserBoard = async() => {
+            setBoardNumbers(getBoard());
+        }
+        getUserBoard();
         const getUsername = async() => {
+            
             const usernameRes = await fetch("/api/username", {
                 method: "GET"
             });
@@ -198,7 +202,7 @@ export function Board() {
                 mode === 3 ? 
                 <div>
                     <button
-                        onClick={() => boardNumbers = buildBoard()}
+                        onClick={() => setBoardNumbers(buildBoard())}
                         className=""
                     >
                         Change Board
