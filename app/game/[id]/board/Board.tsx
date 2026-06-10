@@ -235,6 +235,7 @@ export function Timer() {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const {id} = useParams();
     const [bingoNumberInterval, setBingoNumberInterval] = useState<number>(3000);
+    const [mode, setMode] = useState<number>(1);
     
     const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
         NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
@@ -255,9 +256,19 @@ export function Timer() {
             return IntervalReturns.EmptyArray;
         const tick = Math.floor((Date.now() - payloadInfo.startTime) / bingoNumberInterval);
         const index: number = (payloadInfo.seed + tick * 17) % remainingBingoNumbers.length;
+        if (mode === 2) {
+            const targetIndex = generatedNumbers.indexOf(remainingBingoNumbers[index] + 1);
+         if (targetIndex === -1) {
+            generatedNumbers.splice(targetIndex, 1);
+         } else {
+            generatedNumbers.push(remainingBingoNumbers[index] + 1);
+         }
+         return remainingBingoNumbers[index] + 1;
+        }
         const removedElement = remainingBingoNumbers.splice(index, 1);
+        generatedNumbers.push(removedElement[0] + 1);
         return removedElement[0] + 1;
-    }, [payloadInfo, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, bingoNumberInterval]);
+    }, [payloadInfo, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, bingoNumberInterval, mode]);
 
     function convertToBingoNumber(num: number): string {
         const numString: string = num.toString();
@@ -326,7 +337,7 @@ export function Timer() {
         if (num === IntervalReturns.EmptyArray || isTimerStopped) {
             stopTimer(); // Stop timer if no more remaining Bingo numbers or someone has called Bingo
         } else {
-            generatedNumbers.push(num);
+            //generatedNumbers.push(num);
             const str: string = convertToBingoNumber(num);
             setLetterNum(str);
         }
@@ -346,6 +357,7 @@ export function Timer() {
             const settings: number = await getSettings();
             const time = getTimeSetting(Math.trunc(settings / 100));
             setBingoNumberInterval(time);
+            setMode(settings % 10);
         }
         setSettings();
         console.log(bingoNumberInterval);
