@@ -368,9 +368,24 @@ export function Timer() {
         };
     }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
 
+    const [powers, setPowers] = useState<string[]>([]);
+    const activatePower = () => {
+
+    }
+
     return (
         <div>
             <h1 className="text-4xl mb-6">{letterNum}</h1>
+            {
+                powers.map((name, i) => (
+                    <button
+                        key={i}
+                        onClick={() => activatePower()}
+                        className="">
+                        {name}
+                    </button>
+                ))
+            }
         </div>
     );
 }
