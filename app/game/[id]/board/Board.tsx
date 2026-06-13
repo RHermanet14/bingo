@@ -372,20 +372,30 @@ export function Timer() {
     const activatePower = () => {
 
     }
+    const powerTypes: string[] = ["Test", "Test2", "Test3"]
+    const addPower = () => {// used in setInterval
+        const randInt: number = Math.floor(Math.random() * powerTypes.length);
+        const powerCopy: string[] = powers;
+        powerCopy.push(powerTypes[randInt]);
+        setPowers(powerCopy);
+    }
 
     return (
         <div>
             <h1 className="text-4xl mb-6">{letterNum}</h1>
-            {
-                powers.map((name, i) => (
-                    <button
-                        key={i}
-                        onClick={() => activatePower()}
-                        className="">
-                        {name}
-                    </button>
-                ))
-            }
+            <div className="flex gap-2">
+                {
+                    powers.map((name, i) => (
+                        <button
+                            key={i}
+                            onClick={() => activatePower()}
+                            className="">
+                            {name}
+                        </button>
+                    ))
+                }
+            </div>
+            
         </div>
     );
 }
