@@ -35,7 +35,7 @@ export function Board() {
     const [active, setActive] = useState<boolean[]>(
         () => Array.from({ length: 25 }, () => false)
     );
-    const [username, setUsername] = useState<string>("");
+    const username = localStorage.getItem('username') ?? "unknown";
     const [winner, setWinner] = useState<string>("");
     const {id} = useParams();
 
@@ -147,21 +147,10 @@ export function Board() {
             setBoardNumbers(getBoard());
         }
         getUserBoard();
-        const getUsername = async() => {
-            
-            const usernameRes = await fetch("/api/username", {
-                method: "GET"
-            });
-            const usernameData = await usernameRes.json();
-            setUsername(usernameData.username);
-        }
-        getUsername();
         const setSettings = async()=> {
             const settings: number = await getSettings();
             setWinSettings(Math.trunc(settings / 10) % 10);
             setMode(settings % 10);
-            console.log(settings);
-            console.log(Math.trunc(settings/10) % 10, settings % 10); //win conditions and extra modes
         }
         setSettings();
     }, [getSettings]);
@@ -236,6 +225,7 @@ export function Timer() {
     const {id} = useParams();
     const [bingoNumberInterval, setBingoNumberInterval] = useState<number>(3000);
     const [mode, setMode] = useState<number>(1);
+    const username = localStorage.getItem('username') ?? "unknown";
     
     const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
         NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
@@ -251,9 +241,17 @@ export function Timer() {
 
     const getRandomBingoNumber = useCallback((): number => {
         if (!payloadInfo)
+        {
+            console.log("Returning because null payload");
             return IntervalReturns.NullPayload;
+        }
+            
         if (remainingBingoNumbers.length === 0)
+        {
+            console.log("Returning because empty array");
             return IntervalReturns.EmptyArray;
+        }
+            
         const tick = Math.floor((Date.now() - payloadInfo.startTime) / bingoNumberInterval);
         const index: number = (payloadInfo.seed + tick * 17) % remainingBingoNumbers.length;
         if (mode === 2) {
@@ -295,27 +293,25 @@ export function Timer() {
         if(!id) return;
         const channel = getChannel();
         if(!channel) return;
-        
+        console.log("Testing if useEffect reaches this part")
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
         });
 
         const generateSeed = async () => {
-            const usernameRes = await fetch("/api/username", {
-                method: "GET"
-            });
-            const usernameData = await usernameRes.json();
             const checkHostRes = await fetch("/api/browser", {
                 method: "PUT",
-                body: JSON.stringify({id: id, host: usernameData.username}),
+                body: JSON.stringify({id: id, host: username}),
             });
             const checkHostData = await checkHostRes.json();
+            console.log(checkHostData.valid, id, username);
             if (!checkHostData.valid) return; // return if not host
 
             const res = await fetch("/api/game", {
                 method: "GET"
             });
             const data = await res.json();
+            console.log(5);
             const payload: RandomNumberPayload = {seed:data.seed, startTime: data.startTime};
             channel.send({
                 type: "broadcast",
@@ -328,7 +324,7 @@ export function Timer() {
             removeChannel(); // might be too aggressive
             //channel.unsubscribe();
         };
-    },[id]);
+    },[id, username]);
 
     const setBingoNumber = useCallback(() => {
         const num: number = getRandomBingoNumber();
@@ -360,8 +356,9 @@ export function Timer() {
             setMode(settings % 10);
         }
         setSettings();
-        console.log(bingoNumberInterval);
+        console.log("before: ",intervalRef.current, bingoNumberInterval);
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
+        console.log("after: ", intervalRef.current);
         return () => {
             if (intervalRef.current)
                 clearInterval(intervalRef.current);
@@ -369,10 +366,10 @@ export function Timer() {
     }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
 
     const [powers, setPowers] = useState<string[]>([]);
-    const activatePower = () => {
-
+    const activatePower = (index: number) => {
+        console.log(powers[index]);
     }
-    const powerTypes: string[] = ["Test", "Test2", "Test3"]
+    const powerTypes: string[] = ["Clear Chips", "Swap Boards", "Test3"]
     const addPower = () => {// used in setInterval
         const randInt: number = Math.floor(Math.random() * powerTypes.length);
         const powerCopy: string[] = powers;
@@ -385,14 +382,16 @@ export function Timer() {
             <h1 className="text-4xl mb-6">{letterNum}</h1>
             <div className="flex gap-2">
                 {
+                    mode === 4 ?
                     powers.map((name, i) => (
                         <button
                             key={i}
-                            onClick={() => activatePower()}
+                            onClick={() => activatePower(i)}
                             className="">
                             {name}
                         </button>
                     ))
+                    : null
                 }
             </div>
             
