@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {useParams, useRouter} from "next/navigation";
 import {getChannel, initChannel, removeChannel} from "@/lib/channelManager"
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -293,7 +293,6 @@ export function Timer() {
         if(!id) return;
         const channel = getChannel();
         if(!channel) return;
-        console.log("Testing if useEffect reaches this part")
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
         });
@@ -304,14 +303,12 @@ export function Timer() {
                 body: JSON.stringify({id: id, host: username}),
             });
             const checkHostData = await checkHostRes.json();
-            console.log(checkHostData.valid, id, username);
             if (!checkHostData.valid) return; // return if not host
 
             const res = await fetch("/api/game", {
                 method: "GET"
             });
             const data = await res.json();
-            console.log(5);
             const payload: RandomNumberPayload = {seed:data.seed, startTime: data.startTime};
             channel.send({
                 type: "broadcast",
@@ -326,19 +323,7 @@ export function Timer() {
         };
     },[id, username]);
 
-    const setBingoNumber = useCallback(() => {
-        const num: number = getRandomBingoNumber();
-        if (num === IntervalReturns.NullPayload)
-            return; // Don't stop timer if setSeed hasn't been broadcasted yet
-        if (num === IntervalReturns.EmptyArray || isTimerStopped) {
-            stopTimer(); // Stop timer if no more remaining Bingo numbers or someone has called Bingo
-        } else {
-            //generatedNumbers.push(num);
-            const str: string = convertToBingoNumber(num);
-            setLetterNum(str);
-        }
-    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray]);
-
+    
     const getSettings = useCallback(async(): Promise<number> => {
         const res = await fetch("/api/lobby", {
                 method: "POST",
@@ -348,6 +333,34 @@ export function Timer() {
         return settings.settings;
     }, [id]);
 
+    const [powers, setPowers] = useState<string[]>([]);
+    const activatePower = (index: number) => {
+        console.log(powers[index]);
+    }
+    const powerTypes: string[] = useMemo(() =>["Clear Chips", "Swap Boards", "Test3"], []);
+
+    const setBingoNumber = useCallback(() => {
+        const num: number = getRandomBingoNumber();
+        if (num === IntervalReturns.NullPayload)
+            return; // Don't stop timer if setSeed hasn't been broadcasted yet
+        else if (num === IntervalReturns.EmptyArray || isTimerStopped) {
+            stopTimer(); // Stop timer if no more remaining Bingo numbers or someone has called Bingo
+            return;
+        } else {
+            //generatedNumbers.push(num);
+            const str: string = convertToBingoNumber(num);
+            setLetterNum(str);
+        }
+        const addPower = () => {
+            const randInt: number = Math.floor(Math.random() * powerTypes.length);
+            const powerCopy: string[] = powers;
+            powerCopy.push(powerTypes[randInt]);
+            setPowers(powerCopy);
+        }
+        addPower();
+    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powerTypes, powers]);
+
+
     useEffect(() => {
         const setSettings = async()=> {
             const settings: number = await getSettings();
@@ -356,26 +369,12 @@ export function Timer() {
             setMode(settings % 10);
         }
         setSettings();
-        console.log("before: ",intervalRef.current, bingoNumberInterval);
         intervalRef.current = setInterval(setBingoNumber, bingoNumberInterval);
-        console.log("after: ", intervalRef.current);
         return () => {
             if (intervalRef.current)
                 clearInterval(intervalRef.current);
         };
     }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
-
-    const [powers, setPowers] = useState<string[]>([]);
-    const activatePower = (index: number) => {
-        console.log(powers[index]);
-    }
-    const powerTypes: string[] = ["Clear Chips", "Swap Boards", "Test3"]
-    const addPower = () => {// used in setInterval
-        const randInt: number = Math.floor(Math.random() * powerTypes.length);
-        const powerCopy: string[] = powers;
-        powerCopy.push(powerTypes[randInt]);
-        setPowers(powerCopy);
-    }
 
     return (
         <div>
