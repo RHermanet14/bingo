@@ -339,6 +339,8 @@ export function Timer() {
     }
     const powerTypes: string[] = useMemo(() =>["Clear Chips", "Swap Boards", "Test3"], []);
 
+    let count: number = 0;
+
     const setBingoNumber = useCallback(() => {
         const num: number = getRandomBingoNumber();
         if (num === IntervalReturns.NullPayload)
@@ -357,9 +359,12 @@ export function Timer() {
             powerCopy.push(powerTypes[randInt]);
             setPowers(powerCopy);
         }
-        addPower();
-    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powerTypes, powers]);
-
+        if (count % 5 === 0 && count !== 0) {
+            addPower();
+        }
+        count++;
+        
+    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powerTypes, powers, count]);
 
     useEffect(() => {
         const setSettings = async()=> {
