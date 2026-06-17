@@ -336,6 +336,9 @@ export function Timer() {
     const [powers, setPowers] = useState<string[]>([]);
     const activatePower = (index: number) => {
         console.log(powers[index]);
+        const powerCopy: string[] = powers;
+        powerCopy.splice(index, 1);
+        setPowers(powerCopy);
     }
     const powerTypes: string[] = useMemo(() =>["Clear Chips", "Swap Boards", "Test3"], []);
 
@@ -359,9 +362,9 @@ export function Timer() {
             powerCopy.push(powerTypes[randInt]);
             setPowers(powerCopy);
         }
-        if (count % 5 === 0 && count !== 0) {
+        //if (count % 5 === 0 && count !== 0) {
             addPower();
-        }
+        //}
         count++;
         
     }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powerTypes, powers, count]);
@@ -383,18 +386,22 @@ export function Timer() {
 
     return (
         <div>
-            <h1 className="text-4xl mb-6">{letterNum}</h1>
-            <div className="flex gap-2">
+            <h1 className="text-4xl mb-6 text-center">{letterNum}</h1>
+            <div className="bg-gray-300 flex items-center">
                 {
                     mode === 4 ?
-                    powers.map((name, i) => (
-                        <button
-                            key={i}
-                            onClick={() => activatePower(i)}
-                            className="">
-                            {name}
-                        </button>
-                    ))
+                    <div className="overflow-x-auto gap-5 p-5">
+                        {
+                            powers.map((name, i) => (
+                            <button
+                                key={i}
+                                onClick={() => activatePower(i)}
+                                className={`font-bold text-4x1 p-3 b-5 ${i % 2 === 0 ? "bg-amber-300" : "bg-blue-300"}`}>
+                                {name}
+                            </button>
+                            ))
+                        }
+                    </div>
                     : null
                 }
             </div>
