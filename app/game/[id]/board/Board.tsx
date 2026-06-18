@@ -333,6 +333,8 @@ export function Timer() {
         return settings.settings;
     }, [id]);
 
+    const [users, setUsers] = useState<string[]>([]);
+
     const [powers, setPowers] = useState<string[]>([]);
     const activatePower = (index: number) => {
         console.log(powers[index]);
@@ -392,6 +394,13 @@ export function Timer() {
                     mode === 4 ?
                     <div className="overflow-x-auto gap-5 p-5">
                         {
+                            users.map((name, i) => (
+                                <button key={i} onClick={() => console.log("only one selected at a time")}>
+                                {name}    
+                                </button>
+                            ))
+                        }
+                        {  
                             powers.map((name, i) => (
                             <button
                                 key={i}
