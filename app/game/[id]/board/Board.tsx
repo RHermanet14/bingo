@@ -166,7 +166,11 @@ export function Board() {
             console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
-        channel.subscribe();
+        channel.subscribe((status) => {
+            if(status === "SUBSCRIBED") {
+                channel.track({userId, username});
+            }
+        });
     });
 
     return (
@@ -226,7 +230,8 @@ export function Timer() {
     const [bingoNumberInterval, setBingoNumberInterval] = useState<number>(3000);
     const [mode, setMode] = useState<number>(1);
     const username = localStorage.getItem('username') ?? "unknown";
-    
+    const [users, setUsers] = useState<string[]>([]);
+
     const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
         NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
         EmptyArray = -1, // Return if the remainingBingoNumbers array is empty
@@ -291,8 +296,15 @@ export function Timer() {
 
     useEffect(() => {
         if(!id) return;
-        const channel = getChannel();
+        const channel = getChannel(); // needs presence
         if(!channel) return;
+        channel.on("presence", { event: "sync" }, () => {
+            const presenceState = channel.presenceState<{ userId: string; username: string }>();
+            const users = Object.values(presenceState)
+                .flat()
+                .map((presence) => presence.username);
+            setUsers(users);
+        });
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
         });
@@ -332,8 +344,6 @@ export function Timer() {
         const settings = await res.json();
         return settings.settings;
     }, [id]);
-
-    const [users, setUsers] = useState<string[]>([]);
 
     const [powers, setPowers] = useState<string[]>([]);
     const activatePower = (index: number) => {
