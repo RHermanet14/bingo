@@ -156,9 +156,8 @@ export function Board() {
     }, [getSettings]);
 
     useEffect(() => {
-        const userId = getuserId();
-
-        const channel = initChannel(userId, username);
+        const channel = getChannel();
+        if(!channel) return;
         channelRef.current = channel;
         channel.on("broadcast", {event:"winGame"}, ({payload}) => {
             // set win message to name of player than won
@@ -166,11 +165,7 @@ export function Board() {
             console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
-        channel.subscribe((status) => {
-            if(status === "SUBSCRIBED") {
-                channel.track({userId, username});
-            }
-        });
+        
     });
 
     return (
@@ -296,8 +291,10 @@ export function Timer() {
 
     useEffect(() => {
         if(!id) return;
-        const channel = getChannel(); // needs presence
-        if(!channel) return;
+        const userId = getuserId();
+
+        const channel = initChannel(userId, username);
+        
         channel.on("presence", { event: "sync" }, () => {
             const presenceState = channel.presenceState<{ userId: string; username: string }>();
             const users = Object.values(presenceState)
@@ -307,6 +304,12 @@ export function Timer() {
         });
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
+        });
+
+        channel.subscribe((status) => {
+            if(status === "SUBSCRIBED") {
+                channel.track({userId, username});
+            }
         });
 
         const generateSeed = async () => {
