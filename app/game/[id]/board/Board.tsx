@@ -405,24 +405,28 @@ export function Timer() {
             <div className="bg-gray-300 flex items-center">
                 {
                     mode === 4 ?
-                    <div className="overflow-x-auto gap-5 p-5">
-                        {
-                            users.map((name, i) => (
-                                <button key={i} onClick={() => console.log("only one selected at a time")}>
-                                {name}    
+                    <div> 
+                        <div className="overflow-x-auto gap-5 p-5">
+                            {  
+                                powers.map((name, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => activatePower(i)}
+                                    className={`font-bold text-4x1 p-3 b-5 ${i % 2 === 0 ? "bg-amber-300" : "bg-blue-300"}`}>
+                                    {name}
                                 </button>
-                            ))
-                        }
-                        {  
-                            powers.map((name, i) => (
-                            <button
-                                key={i}
-                                onClick={() => activatePower(i)}
-                                className={`font-bold text-4x1 p-3 b-5 ${i % 2 === 0 ? "bg-amber-300" : "bg-blue-300"}`}>
-                                {name}
-                            </button>
-                            ))
-                        }
+                                ))
+                            }
+                        </div>
+                        <div>
+                            {
+                                users.map((name, i) => (
+                                    <button key={i} onClick={() => console.log("only one selected at a time")}>
+                                    {name}    
+                                    </button>
+                                ))
+                            }
+                        </div>
                     </div>
                     : null
                 }
