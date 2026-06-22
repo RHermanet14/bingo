@@ -399,14 +399,17 @@ export function Timer() {
         };
     }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
 
+    const [powerVisibility, setPowerVisibility] = useState<boolean>(true);
     return (
         <div>
             <h1 className="text-4xl mb-6 text-center">{letterNum}</h1>
-            <div className="bg-gray-300 flex items-center">
+            <button className="bg-gray-400 rounded p-5 font-bold" onClick={() => setPowerVisibility(!powerVisibility)}>Toggle Button Visibility</button>
+            <div >
                 {
-                    mode === 4 ?
+                    mode === 4 && powerVisibility ?
                     <div> 
-                        <div className="overflow-x-auto gap-5 p-5">
+                        <div className="bg-gray-300 flex items-center">
+                            <div className="overflow-x-auto gap-5 p-5">
                             {  
                                 powers.map((name, i) => (
                                 <button
@@ -417,11 +420,13 @@ export function Timer() {
                                 </button>
                                 ))
                             }
+                            </div>
                         </div>
-                        <div>
+                        <h1 className="text-center font-bold text-5xl p-5">Select a player to target</h1>
+                        <div className="bg-gray-300 p-5 font-bold text-4xl flex">
                             {
                                 users.map((name, i) => (
-                                    <button key={i} onClick={() => console.log("only one selected at a time")}>
+                                    <button key={i} className="bg-gray-400 p-5 rounded" onClick={() => console.log("only one selected at a time")}>
                                     {name}    
                                     </button>
                                 ))
