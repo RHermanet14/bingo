@@ -400,6 +400,12 @@ export function Timer() {
     }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
 
     const [powerVisibility, setPowerVisibility] = useState<boolean>(true);
+    const [active, setActive] = useState<boolean[]>([]);
+
+    const selectPlayer = (index: number) => {
+        setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
+    };
+
     return (
         <div>
             <h1 className="text-4xl mb-6 text-center">{letterNum}</h1>
@@ -426,8 +432,8 @@ export function Timer() {
                         <div className="bg-gray-300 p-5 font-bold text-4xl flex">
                             {
                                 users.map((name, i) => (
-                                    <button key={i} className="bg-gray-400 p-5 rounded" onClick={() => console.log("only one selected at a time")}>
-                                    {name}    
+                                    <button key={i} onClick={() => selectPlayer(i)} className={`${active[i] ? "bg-yellow-300 opacity-75" : "bg-gray-400"} p-5 rounded`}>
+                                        {name}    
                                     </button>
                                 ))
                             }
