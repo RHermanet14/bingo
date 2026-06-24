@@ -226,6 +226,7 @@ export function Timer() {
     const [mode, setMode] = useState<number>(1);
     const username = localStorage.getItem('username') ?? "unknown";
     const [users, setUsers] = useState<string[]>([]);
+    const [active, setActive] = useState<boolean[]>([]);
 
     const enum IntervalReturns { // Return values for getRandomBingoNumber that aren't valid bingo numbers 0 - 74
         NullPayload = -2, // Return if the host hasn't send a broadcast containing the seed and start time to generate a deterministic random number
@@ -301,6 +302,7 @@ export function Timer() {
                 .flat()
                 .map((presence) => presence.username);
             setUsers(users);
+            setActive(new Array(users.length).fill(false));
         });
         channel.on("broadcast", {event: "setSeed"}, (msg: {payload: RandomNumberPayload}) => {
             setPayloadInfo(msg.payload);
@@ -400,7 +402,7 @@ export function Timer() {
     }, [setBingoNumber, id, bingoNumberInterval, getSettings]);
 
     const [powerVisibility, setPowerVisibility] = useState<boolean>(true);
-    const [active, setActive] = useState<boolean[]>([]);
+    
 
     const selectPlayer = (index: number) => {
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
