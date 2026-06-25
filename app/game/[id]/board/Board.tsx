@@ -294,7 +294,7 @@ export function Timer() {
         if(!id) return;
         const userId = getuserId();
 
-        const channel = initChannel(userId, username);
+        const channel = initChannel(id.toString(), username);
         
         channel.on("presence", { event: "sync" }, () => {
             const presenceState = channel.presenceState<{ userId: string; username: string }>();
@@ -405,7 +405,7 @@ export function Timer() {
     
 
     const selectPlayer = (index: number) => {
-        setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
+        setActive(prev => prev.map((val, i) => (i === index ? true : false)));
     };
 
     return (

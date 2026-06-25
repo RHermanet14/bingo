@@ -50,11 +50,10 @@ export default function LobbyList() {
     });
     
     const increaseSize = async() => {
-      const res = await fetch("/api/validate", {
+      await fetch("/api/validate", {
         method: "PUT",
         body: JSON.stringify({id: id, amount: 1})   
       });
-      console.log("increase size count: ", res);
     }
     increaseSize();
 
@@ -72,7 +71,6 @@ export default function LobbyList() {
             body: JSON.stringify({id: id})
           });
         }
-       console.log("decrease size count: ", res);
       }
       decreaseSize();
     };
