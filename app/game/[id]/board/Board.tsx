@@ -351,13 +351,25 @@ export function Timer() {
     }, [id]);
 
     const [powers, setPowers] = useState<string[]>([]);
+    const powerTypes: string[] = useMemo(() =>["Clear Chips", "Swap Boards", "Test3"], []);
     const activatePower = (index: number) => {
-        console.log(powers[index]);
+        const player: string = users[index];
+        console.log(player);
+        switch(powers[index]) {
+            case powerTypes[0]:
+                break;
+            case powerTypes[1]:
+                break;
+            case powerTypes[2]:
+                break;
+            default:
+                break;
+        }
+        // remove power from list
         const powerCopy: string[] = powers;
         powerCopy.splice(index, 1);
         setPowers(powerCopy);
     }
-    const powerTypes: string[] = useMemo(() =>["Clear Chips", "Swap Boards", "Test3"], []);
 
     let count: number = 0;
 
@@ -430,8 +442,8 @@ export function Timer() {
                             }
                             </div>
                         </div>
-                        <h1 className="text-center font-bold text-5xl p-5">Select a player to target</h1>
-                        <div className="bg-gray-300 p-5 font-bold text-4xl flex">
+                        <h1 className="text-center font-bold text-5xl p-5">Target Player:</h1>
+                        <div className="bg-gray-300 p-5 font-bold text-4xl flex gap-5">
                             {
                                 users.map((name, i) => (
                                     <button key={i} onClick={() => selectPlayer(i)} className={`${active[i] ? "bg-yellow-300 opacity-75" : "bg-gray-400"} p-5 rounded`}>
