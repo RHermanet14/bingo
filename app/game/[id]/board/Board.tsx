@@ -6,7 +6,6 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 import { buildBoard, getBoard, getuserId } from "@/lib/localVars";
 import { getTimeSetting } from "@/lib/localVars";
 import { LobbyRow } from "@/app/lobby/[id]/grid/types";
-import { UUID } from "crypto";
 
 //#region Global variables
 const winConditions: number[][] = [ // list of win conditions
@@ -28,6 +27,7 @@ const remainingBingoNumbers: number[] = Array.from({length: 75}, (_, i) => i); /
 const generatedNumbers: number[] = []; // list of numbers already called
 
 let isTimerStopped: boolean = false;
+const powerTypes: string[] =["Clear Chips", "Swap Boards", "Test3"];
 //#endregion
 
 export function Board() {
@@ -167,6 +167,22 @@ export function Board() {
             console.log(payload.message, " has won the game!");
             isTimerStopped = true;
         });
+        const userId = getuserId();
+        channel.on("broadcast", {event:"power_activated"}, ({payload}) => {
+            if (payload.userId === userId) {
+                console.log(payload.userId);
+                switch(payload.power) {
+                    case powerTypes[0]: //clear chips
+                        break;
+                    case powerTypes[1]: // swap board
+                        break;
+                    case powerTypes[2]: // test 3 (change this eventually)
+                        break;
+                    default:
+                        break;
+                }
+            }
+        })
         
     });
 
@@ -230,7 +246,7 @@ export function Timer() {
     const [users, setUsers] = useState<LobbyRow[]>([]);
     const [active, setActive] = useState<boolean[]>([]);
     const [powers, setPowers] = useState<string[]>([]);
-    const powerTypes: string[] = useMemo(() =>["Clear Chips", "Swap Boards", "Test3"], []);
+    
     const channelRef = useRef<RealtimeChannel>(null);
 
 
@@ -241,7 +257,7 @@ export function Timer() {
 
     type PowerPayload = {
         userId: string;
-        index: number;
+        power: string;
     }
 
     type RandomNumberPayload = {
@@ -321,20 +337,16 @@ export function Timer() {
         channel.on("broadcast", {event:"power_activated"}, ({payload}) => {
             if (payload.userId === userId) {
                 console.log(payload.userId);
-                switch(powers[payload.index]) {
-                    case powerTypes[0]:
+                switch(payload.power) {
+                    case powerTypes[0]: //clear chips
                         break;
-                    case powerTypes[1]:
+                    case powerTypes[1]: // swap board
                         break;
-                    case powerTypes[2]:
+                    case powerTypes[2]: // test 3 (change this eventually)
                         break;
                     default:
                         break;
                 }
-                // remove power from list
-                const powerCopy: string[] = powers;
-                powerCopy.splice(payload.index, 1);
-                setPowers(powerCopy);
             }
         })
 
@@ -368,7 +380,7 @@ export function Timer() {
             removeChannel(); // might be too aggressive
             //channel.unsubscribe();
         };
-    },[id, username, active, powerTypes, powers, users]); // will most likely cause problems
+    },[id, username, active, powers, users]); // will most likely cause problems
 
     
     const getSettings = useCallback(async(): Promise<number> => {
@@ -407,7 +419,7 @@ export function Timer() {
         //}
         count++;
         
-    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powerTypes, powers, count]);
+    }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powers, count]);
 
     useEffect(() => {
         const setSettings = async()=> {
@@ -428,12 +440,16 @@ export function Timer() {
     
     const activatePower = (index: number) => { //where index = which power in the power array
         const userId = getuserId();
-        const payload: PowerPayload = {userId:userId, index: index};
+        const payload: PowerPayload = {userId:userId, power: powers[index]};
         channelRef.current?.send({
             type:"broadcast",
             event:"power_activated",
             payload:payload
         })
+        // remove power from list
+        const powerCopy: string[] = powers;
+        powerCopy.splice(index, 1);
+        setPowers(powerCopy);
     }
 
     const selectPlayer = (index: number) => {
