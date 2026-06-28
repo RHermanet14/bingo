@@ -173,12 +173,14 @@ export function Board() {
                 console.log(payload.userId);
                 switch(payload.power) {
                     case powerTypes[0]: //clear chips
+                        setActive(Array.from({ length: 25 }, () => false));
                         break;
                     case powerTypes[1]: // swap board
+                        setBoardNumbers(buildBoard());
                         break;
                     case powerTypes[2]: // test 3 (change this eventually)
                         break;
-                    default:
+                    default: // Do nothing
                         break;
                 }
             }
@@ -338,10 +340,6 @@ export function Timer() {
             if (payload.userId === userId) {
                 console.log(payload.userId);
                 switch(payload.power) {
-                    case powerTypes[0]: //clear chips
-                        break;
-                    case powerTypes[1]: // swap board
-                        break;
                     case powerTypes[2]: // test 3 (change this eventually)
                         break;
                     default:
