@@ -46,6 +46,7 @@ export function Board() {
     const [boardNumbers,setBoardNumbers] = useState<number[]>([]); // represents user's board
 
     const placeChip = (index: number) => {
+        if (isTimerStopped) return;
         setActive(prev => prev.map((val, i) => (i === index ? !val : val)));
     };
 
@@ -395,10 +396,14 @@ export function Timer() {
     let count: number = 0;
 
     const setBingoNumber = useCallback(() => {
+        if (isTimerStopped) {
+            stopTimer();
+            return;
+        }
         const num: number = getRandomBingoNumber();
         if (num === IntervalReturns.NullPayload)
             return; // Don't stop timer if setSeed hasn't been broadcasted yet
-        else if (num === IntervalReturns.EmptyArray || isTimerStopped) {
+        else if (num === IntervalReturns.EmptyArray) {
             stopTimer(); // Stop timer if no more remaining Bingo numbers or someone has called Bingo
             return;
         } else {
@@ -412,9 +417,9 @@ export function Timer() {
             powerCopy.push(powerTypes[randInt]);
             setPowers(powerCopy);
         }
-        //if (count % 5 === 0 && count !== 0) {
+        if (count % 5 === 0 && count !== 0) {
             addPower();
-        //}
+        }
         count++;
         
     }, [getRandomBingoNumber, IntervalReturns.NullPayload, IntervalReturns.EmptyArray, powers, count]);
@@ -437,6 +442,7 @@ export function Timer() {
     const [powerVisibility, setPowerVisibility] = useState<boolean>(true);
     
     const activatePower = (index: number) => { //where index = which power in the power array
+        if (isTimerStopped) return;
         const userId = getuserId();
         const payload: PowerPayload = {userId:userId, power: powers[index]};
         channelRef.current?.send({
@@ -451,6 +457,7 @@ export function Timer() {
     }
 
     const selectPlayer = (index: number) => {
+        if (isTimerStopped) return;
         setActive(prev => prev.map((val, i) => (i === index ? true : false)));
     };
 
