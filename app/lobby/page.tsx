@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import {useState} from "react"
 
 export default function LobbyPage() {
-    const username = localStorage.getItem('username') ?? "unknown";
+    const username = typeof window !== 'undefined' 
+        ? localStorage.getItem('username') ?? "unknown" 
+        : "unknown";
     const router = useRouter();
     const [password, setPassword] = useState("");
 
